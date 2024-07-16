@@ -12,7 +12,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.ucne.geekmarket.presentation.ProductoListScreen
+import androidx.navigation.compose.rememberNavController
+import com.ucne.alexandersuarez_ap2_p1.presentation.navigation.GeekMarketNavHost
 import com.ucne.geekmarket.ui.theme.GeekMarketTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -24,8 +25,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             GeekMarketTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-                        ProductoListScreen(onVerProducto = {}, onAddProducto = {})
+                    Column(modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)) {
+                        val navHost = rememberNavController()
+                        GeekMarketNavHost(navHost)
                     }
                 }
             }

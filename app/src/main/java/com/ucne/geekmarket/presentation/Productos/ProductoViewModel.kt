@@ -1,4 +1,4 @@
-package com.ucne.geekmarket.presentation
+package com.ucne.geekmarket.presentation.Productos
 
 
 import androidx.lifecycle.ViewModel
@@ -23,9 +23,6 @@ class ProductoViewModel @Inject constructor(
     private val _uiState = MutableStateFlow((ProductoUistate()))
     val uiState = _uiState.asStateFlow()
 
-
-    
-
     fun onSetProducto(productoId: Int) {
         viewModelScope.launch {
             val producto = productoRepository.getProducto(productoId)
@@ -36,43 +33,10 @@ class ProductoViewModel @Inject constructor(
                         nombre = producto.nombre,
                         precio = producto.precio,
                         descripcion = producto.descripcion,
+                        especificacion = producto.especificacion,
                         categoria = producto.categoria,
                         imagen = producto.imagen,
                         stock = producto.stock,
-                    )
-                }
-            }
-        }
-    }
-
-    fun onDescripcionChanged(descripcion: String) {
-        _uiState.update {
-            it.copy(descripcion = descripcion)
-        }
-    }
-
-
-    fun onPrecioChanged(precio: String) {
-        val letras = Regex("[a-zA-Z ]+")
-        val numeros = precio.replace(letras, "").toDoubleOrNull()
-        _uiState.update {
-            it.copy(precio = numeros)
-        }
-    }
-
-    fun setProducto() {
-        viewModelScope.launch {
-            val producto = productoRepository.getProducto(uiState.value.productoId ?: 0)
-            producto?.let {
-                _uiState.update {
-                    it.copy(
-                        productoId = producto.productoId,
-                        nombre = producto.nombre,
-                        precio = producto.precio,
-                        descripcion = producto.descripcion,
-                        stock = producto.stock,
-                        imagen = producto.imagen,
-                        categoria = producto.categoria,
                     )
                 }
             }
@@ -171,34 +135,6 @@ class ProductoViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
     }
-
-
-    fun saveProducto(): Boolean {
-        viewModelScope.launch {
-            if (uiState.value.productoId == null || uiState.value.productoId == 0) {
-                productoRepository.saveProducto(uiState.value.toDTO())
-                _uiState.value = ProductoUistate()
-            } else {
-                productoRepository.updateProducto(uiState.value.toDTO())
-                _uiState.value = ProductoUistate()
-            }
-        }
-        return true
-    }
-
-
-    fun newProducto() {
-        viewModelScope.launch {
-            _uiState.value = ProductoUistate()
-        }
-    }
-
-    fun deleteProducto() {
-        viewModelScope.launch {
-            productoRepository.deleteProducto(uiState.value.toDTO())
-        }
-    }
-
 }
 
 data class ProductoUistate(
@@ -211,6 +147,7 @@ data class ProductoUistate(
     val imagen: String? = null,
     val especificacion: String? = null,
     val isLoading: Boolean = false,
+    val producto: ProductoDto? = null,
     val laptops: List<ProductoDto> = emptyList(),
     val descktops: List<ProductoDto> = emptyList(),
     val laptopsGaming: List<ProductoDto> = emptyList(),

@@ -1,10 +1,9 @@
-package com.ucne.geekmarket.presentation
+package com.ucne.geekmarket.presentation.Productos
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -44,8 +43,7 @@ import com.ucne.geekmarket.ui.theme.BottonBar
 @Composable
 fun ProductoListScreen(
     viewModel: ProductoViewModel = hiltViewModel(),
-    onVerProducto: (ProductoDto) -> Unit,
-    onAddProducto: () -> Unit,
+    onVerProducto: (ProductoDto) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
@@ -57,10 +55,7 @@ fun ProductoListScreen(
         laptopsGaming = uiState.laptopsGaming,
         desktops = uiState.descktops,
         onVerProducto = onVerProducto,
-        onAddProducto = onAddProducto,
         onList = viewModel::getProductos,
-        uistate = uiState,
-
         )
 }
 
@@ -71,9 +66,8 @@ fun ProductoListBody(
     desktops: List<ProductoDto>,
     laptopsGaming: List<ProductoDto>,
     onVerProducto: (ProductoDto) -> Unit,
-    onAddProducto: () -> Unit,
     onList: () -> Unit,
-    uistate: ProductoUistate,
+//    uistate: ProductoUistate,
 ) {
 
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
@@ -82,7 +76,7 @@ fun ProductoListBody(
                 Row {
                     Text(text = "GeekMarket")
                     TextButton(onClick = { onList() }) {
-                        Text(text = "Get Tickets")
+                        Text(text = "Get Productos")
                     }
                 }
             }
@@ -90,6 +84,7 @@ fun ProductoListBody(
     },
         bottomBar = {
             BottonBar()
+//            BottomBarPrueba()
         }
         ) { innerPadding ->
         LazyColumn(
@@ -228,46 +223,6 @@ fun ProductoListBody(
 
             }
 
-        }
-    }
-}
-
-
-
-
-@Composable
-fun ProductCardDetailed(product: ProductoDto) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .height(500.dp)
-            .padding(1.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(8.dp)
-        ) {
-            AsyncImage(
-                model = product.imagen,
-                contentDescription = product.nombre,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = product.nombre,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Category: ${product.categoria}")
-            Text(text = "Price: $${product.precio}")
-            Text(text = "Stock: ${product.stock}")
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = product.descripcion, style = MaterialTheme.typography.bodyMedium)
         }
     }
 }

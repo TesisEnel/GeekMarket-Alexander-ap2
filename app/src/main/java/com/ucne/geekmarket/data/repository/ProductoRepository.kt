@@ -64,6 +64,7 @@ class ProductoRepository @Inject constructor(
         return try {
             productoApi.getProducto(id)
         } catch (e: Exception) {
+            e.message?.let { Log.e( "Error", it) }
             null
         }
     }
