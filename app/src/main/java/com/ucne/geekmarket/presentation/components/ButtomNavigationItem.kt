@@ -1,4 +1,4 @@
-package com.ucne.geekmarket.ui.theme
+package com.ucne.geekmarket.presentation.components
 
 import androidx.compose.ui.graphics.vector.ImageVector
 

@@ -52,4 +52,10 @@ object AppModule {
     @Provides
     fun provideProductoDao(database: GeekMarketDb) = database.productoDao()
 
+    @Provides
+    fun provideCarritoDao(database: GeekMarketDb) = database.carritoDao()
+
+    @Provides
+    fun providePersona(database: GeekMarketDb) = database.personaDao()
+
 }

@@ -36,7 +36,7 @@ class ProductoViewModel @Inject constructor(
                         especificacion = producto.especificacion,
                         categoria = producto.categoria,
                         imagen = producto.imagen,
-                        stock = producto.stock,
+                        stock = producto.stocks,
                     )
                 }
             }
@@ -162,6 +162,6 @@ fun ProductoUistate.toDTO() = ProductoDto(
     descripcion = descripcion?: "",
     categoria = categoria?: "",
     imagen = imagen?: "",
-    stock = stock?: 0,
+    stocks = stock?: 0,
     especificacion = especificacion?: "",
 )

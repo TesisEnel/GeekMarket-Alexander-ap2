@@ -1,4 +1,4 @@
-package com.ucne.geekmarket.ui.theme
+package com.ucne.geekmarket.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -14,12 +14,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
@@ -28,6 +28,8 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,10 +42,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.ucne.alexandersuarez_ap2_p1.presentation.navigation.Screen
 import com.ucne.geekmarket.R
+import com.ucne.geekmarket.presentation.Carritos.CarritoViewModel
+import com.ucne.geekmarket.ui.theme.CardColor
+import com.ucne.geekmarket.ui.theme.SecondaryColor
+import com.ucne.geekmarket.ui.theme.ThinTextColor
 
 @Composable
-fun BottonBar() {
+fun BottonBar(goToListaProducto: () -> Unit, goToCarrito: () -> Unit) {
+    val viewModel: CarritoViewModel = hiltViewModel()
+    val uiState by viewModel.uiState.collectAsState()
+//    LaunchedEffect(Unit) {
+        viewModel.getLastCarrito()
+//    }
     Box(contentAlignment = Alignment.BottomCenter){
         NavigationBar(
             modifier = Modifier
@@ -58,29 +71,29 @@ fun BottonBar() {
         ) {
             val items = listOf(
                 ButtomNavigationItem(
+                    title = "ShoppingCart",
+                    selectedIcon = Icons.Filled.ShoppingCart,
+                    unselectedIcon = Icons.Outlined.ShoppingCart,
+                    hasNews = false,
+                    badgeCount = 45
+                ),
+                ButtomNavigationItem(
                     title = "Home",
                     selectedIcon = Icons.Filled.Home,
                     unselectedIcon = Icons.Outlined.Home,
                     hasNews = false
                 ),
                 ButtomNavigationItem(
-                    title = "Chat",
-                    selectedIcon = Icons.Filled.Email,
-                    unselectedIcon = Icons.Outlined.Email,
-                    hasNews = false,
-                    badgeCount = 45
-                ),
-                ButtomNavigationItem(
-                    title = "Settings",
-                    selectedIcon = Icons.Filled.Settings,
-                    unselectedIcon = Icons.Outlined.Settings,
+                    title = "Profile",
+                    selectedIcon = Icons.Filled.Person,
+                    unselectedIcon = Icons.Outlined.Person,
                     hasNews = false
                 ),
 
 
                 )
             var selectedeItemIndex by rememberSaveable {
-                mutableStateOf(0)
+                mutableStateOf(1)
             }
 
             items.forEachIndexed { index, item ->
@@ -90,6 +103,12 @@ fun BottonBar() {
                     selected = selectedeItemIndex == index,
                     onClick = {
                         selectedeItemIndex = index
+                        when(selectedeItemIndex){
+                            0 -> {goToCarrito()}
+                            1 -> goToListaProducto()
+                            else -> goToListaProducto()
+//                            2 -> { TODO()}
+                        }
     //                                    navController.navigate(item.title)
                     },
                     label = {
@@ -98,13 +117,12 @@ fun BottonBar() {
                     icon = {
                         BadgedBox(
                             badge = {
-                                if (item.badgeCount != null) {
-                                    Badge {
-                                        Text(text = "1")
+                                if(index == 0){
+                                    if (uiState.items?.isNotEmpty() == true) {
+                                        Badge {
+                                            Text(text = uiState.items?.size.toString())
+                                        }
                                     }
-                                } else {
-                                    Badge()
-
                                 }
                             }
                         ) {
@@ -130,7 +148,7 @@ fun BottonBar() {
 private fun prueba() {
 //    BottomBarPrueba()
 
-    BottonBar()
+//    BottonBar({ }) { navHostController.navigate(Screen.CarritoList) }
 }
 
 
