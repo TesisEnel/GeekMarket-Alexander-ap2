@@ -43,7 +43,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.ucne.geekmarket.data.local.entities.Items
+import com.ucne.geekmarket.data.local.entities.ItemEntity
+import com.ucne.geekmarket.data.local.entities.ProductoEntity
 import com.ucne.geekmarket.data.remote.dto.ProductoDto
 import com.ucne.geekmarket.presentation.Carritos.CarritoViewModel
 import com.ucne.geekmarket.presentation.Carritos.carritoUistate
@@ -53,39 +54,41 @@ import com.ucne.geekmarket.presentation.Carritos.carritoUistate
 fun ProductoListScreen(
     viewModel: ProductoViewModel = hiltViewModel(),
     viewModelCarrito: CarritoViewModel = hiltViewModel(),
-    onVerProducto: (ProductoDto) -> Unit,
+    onVerProducto: (ProductoEntity) -> Unit,
     innerPadding: PaddingValues,
 
     ) {
-//    LaunchedEffect(Unit) {
-//        viewModelCarrito.getLastCarrito()
-//    }
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val uiStateCarrito by viewModelCarrito.uiState.collectAsStateWithLifecycle()
+    val laptops = viewModel.laptops.collectAsStateWithLifecycle()
+    val laptopsGaming = viewModel.laptopsGaming.collectAsStateWithLifecycle()
+    val desktops = viewModel.descktops.collectAsStateWithLifecycle()
+
+
     LaunchedEffect(Unit) {
-        viewModel.getProductosByCategoria()
+//        viewModel.getProductosByCategoria()
+        viewModel.getProductos()
         viewModelCarrito.getLastCarrito()
     }
     ProductoListBody(
-        laptops = uiState.laptops,
-        laptopsGaming = uiState.laptopsGaming,
-        desktops = uiState.descktops,
+        laptops =   laptops.value,
+        laptopsGaming = laptopsGaming.value,
+        desktops = desktops.value,
         onVerProducto = onVerProducto,
         innerPadding = innerPadding,
         onAddItem = viewModelCarrito::onAddItem,
-        uiStateCarrito = uiStateCarrito,
     )
 }
 
 @Composable
 fun ProductoListBody(
-    laptops: List<ProductoDto>,
-    desktops: List<ProductoDto>,
-    laptopsGaming: List<ProductoDto>,
-    onVerProducto: (ProductoDto) -> Unit,
+    laptops: List<ProductoEntity>,
+    desktops: List<ProductoEntity>,
+    laptopsGaming: List<ProductoEntity>,
+    onVerProducto: (ProductoEntity) -> Unit,
     innerPadding: PaddingValues,
-    uiStateCarrito: carritoUistate,
-    onAddItem: (Items) -> Unit,
+    onAddItem: (ItemEntity) -> Unit,
 ) {
 
     var cantidad by remember { mutableStateOf(0) }
@@ -131,7 +134,7 @@ fun ProductoListBody(
                                 verticalAlignment = Alignment.CenterVertically) {
 
                                 ProductCard(
-                                    product = item,
+                                    producto = item,
                                     onAddToCart = onAddItem,
                                     )
 
@@ -177,7 +180,7 @@ fun ProductoListBody(
                                 verticalAlignment = Alignment.CenterVertically) {
 
                                 ProductCard(
-                                    product = item,
+                                    producto = item,
                                     onAddToCart = onAddItem,
                                     )
 
@@ -220,7 +223,7 @@ fun ProductoListBody(
                                 verticalAlignment = Alignment.CenterVertically) {
 
                                 ProductCard(
-                                    product = item,
+                                    producto = item,
                                     onAddToCart = onAddItem,
                                 )
 
@@ -235,7 +238,7 @@ fun ProductoListBody(
 }
 
 @Composable
-fun ProductCard(product: ProductoDto, onAddToCart: (Items) -> Unit) {
+fun ProductCard(producto: ProductoEntity, onAddToCart: (ItemEntity) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -245,7 +248,7 @@ fun ProductCard(product: ProductoDto, onAddToCart: (Items) -> Unit) {
     ) {
         var cantidad by remember { mutableStateOf(0) }
         IconButton(
-            onClick = { onAddToCart(Items(0, product, cantidad)) },
+            onClick = { onAddToCart(ItemEntity(productoId = producto.productoId, cantidad = cantidad)) },
             modifier = Modifier
                 .align(Alignment.End)
                 .size(30.dp)
@@ -260,8 +263,8 @@ fun ProductCard(product: ProductoDto, onAddToCart: (Items) -> Unit) {
                 .padding(16.dp)
         ) {
             AsyncImage(
-                model = product.imagen,
-                contentDescription = product.nombre,
+                model = producto.imagen,
+                contentDescription = producto.nombre,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp)
@@ -269,7 +272,7 @@ fun ProductCard(product: ProductoDto, onAddToCart: (Items) -> Unit) {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = product.nombre,
+                text = producto.nombre,
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
@@ -286,8 +289,8 @@ fun ProductCard(product: ProductoDto, onAddToCart: (Items) -> Unit) {
                     Icon(imageVector = Icons.Default.Add, contentDescription = "Increase Quantity")
                 }
             }
-            Text(text = "Descripción: ${product.especificacion}", maxLines = 4)
-            Text(text = "Precio: ${product.precio}")
+            Text(text = "Descripción: ${producto.especificacion}", maxLines = 4)
+            Text(text = "Precio: ${producto.precio}")
         }
     }
 }

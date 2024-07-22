@@ -25,7 +25,26 @@ interface ProductoDao {
     )
     suspend fun find(id: Int): ProductoEntity?
 
+
     @Query("SELECT * FROM productos")
     fun getAll(): Flow<List<ProductoEntity>>
+
+    @Query(
+        """
+            SELECT p.*
+            FROM Productos p
+            JOIN Items i ON p.productoId = i.productoId
+            WHERE i.carritoId = :id;
+        """
+    )
+    suspend fun getProductoItem(id: Int): List<ProductoEntity>
+    @Query(
+        """
+            SELECT *
+            FROM Productos p
+            WHERE categoria = :categoria;
+        """
+    )
+    fun getProductoByCategoria(categoria: String): Flow<List<ProductoEntity>>
 
 }

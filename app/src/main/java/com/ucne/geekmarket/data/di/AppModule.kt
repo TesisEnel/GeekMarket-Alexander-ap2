@@ -51,6 +51,8 @@ object AppModule {
 
     @Provides
     fun provideProductoDao(database: GeekMarketDb) = database.productoDao()
+    @Provides
+    fun provideItemDao(database: GeekMarketDb) = database.itemDao()
 
     @Provides
     fun provideCarritoDao(database: GeekMarketDb) = database.carritoDao()

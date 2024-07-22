@@ -21,6 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,24 +31,28 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.ucne.geekmarket.data.local.entities.Items
+import com.ucne.geekmarket.data.local.entities.ItemEntity
+import com.ucne.geekmarket.presentation.Productos.ProductoViewModel
 import com.ucne.geekmarket.presentation.components.CenteredTextDivider
-import kotlin.reflect.KFunction0
 
 @Composable
 fun CarritoListScreen(
     innerPadding: PaddingValues,
     viewModel: CarritoViewModel = hiltViewModel(),
+    productoViewModel: ProductoViewModel = hiltViewModel(),
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit) {
         viewModel.getLastCarrito()
+    }
 
     CarritoListScreenBody(
         uiState = uiState,
         innerPadding = innerPadding,
         onRemoveItem = viewModel::deleteItem,
+        calcularTotal = { viewModel.calcularTotal() }
     )
 }
 
@@ -55,19 +60,21 @@ fun CarritoListScreen(
 fun CarritoListScreenBody(
     uiState: carritoUistate,
     innerPadding: PaddingValues,
-    onRemoveItem: (Int) -> Unit) {
+    onRemoveItem: (ItemEntity) -> Unit,
+    calcularTotal: () -> Unit
+) {
 
     LazyColumn(modifier = Modifier.padding(innerPadding)) {
         items(uiState.items ?: emptyList()) { item ->
             CartItemCard(
+                uiState = uiState,
                 item = item,
-                onRemoveItem = onRemoveItem
+                onRemoveItem = onRemoveItem,
+                calcularTotal = calcularTotal
             )
         }
         item {
-            val total = uiState.items?.sumOf { item ->
-                (item.cantidad ?: 0) * (item.producto?.precio ?: 0.0)
-            }
+            val total = uiState.total
             CenteredTextDivider(text = "Total: ${total} ")
         }
     }
@@ -76,8 +83,10 @@ fun CarritoListScreenBody(
 
 @Composable
 fun CartItemCard(
-    item: Items,
-    onRemoveItem: (Int) -> Unit
+    uiState: carritoUistate,
+    calcularTotal: () -> Unit,
+    item: ItemEntity,
+    onRemoveItem: (ItemEntity) -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -85,6 +94,7 @@ fun CartItemCard(
             .padding(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
+        val producto = uiState.productos?.find { it.productoId == item.productoId }
         Column {
             Row(
                 modifier = Modifier
@@ -92,34 +102,39 @@ fun CartItemCard(
                     .padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                item.producto?.imagen?.let { imageUrl ->
-                    AsyncImage(
-                        model = imageUrl,
-                        contentDescription = item.producto.nombre,
-                        modifier = Modifier
-                            .size(80.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                }
+                AsyncImage(
+                    model = producto?.imagen,
+                    contentDescription = producto?.nombre,
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+
                 Column {
                     Row {
                         Text(
-                            text = item.producto?.nombre ?: "",
+                            text = producto?.nombre ?: "",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.weight(0.30f)
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Precio: $${item.producto?.precio ?: 0}",
+                            text = "Precio: $${producto?.precio ?: 0}",
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Text(
                             text = "x:${item.cantidad ?: 0}",
                             style = MaterialTheme.typography.bodyMedium
                         )
-                        IconButton(onClick = { item.producto?.productoId?.let { onRemoveItem(it) } }, modifier = Modifier.padding(1.dp)) {
+                        IconButton(
+                            onClick = {
+                                onRemoveItem(item)
+                                calcularTotal()
+                            },
+                            modifier = Modifier.padding(1.dp)
+                        ) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
                                 contentDescription = "Remove Item"
@@ -127,7 +142,7 @@ fun CartItemCard(
                         }
                     }
                     Text(
-                        text = "Monto: ${(item.producto?.precio ?: 0.0) * (item.cantidad ?: 0)}",
+                        text = "Monto: ${uiState.total}",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }

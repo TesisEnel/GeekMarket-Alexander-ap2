@@ -55,7 +55,7 @@ fun BottonBar(goToListaProducto: () -> Unit, goToCarrito: () -> Unit) {
     val viewModel: CarritoViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
 //    LaunchedEffect(Unit) {
-        viewModel.getLastCarrito()
+//        viewModel.getLastCarrito()
 //    }
     Box(contentAlignment = Alignment.BottomCenter){
         NavigationBar(

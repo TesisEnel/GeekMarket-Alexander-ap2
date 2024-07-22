@@ -3,14 +3,17 @@ package com.ucne.geekmarket.presentation.Productos
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ucne.geekmarket.data.local.entities.ProductoEntity
 import com.ucne.geekmarket.data.remote.dto.ProductoDto
 import com.ucne.geekmarket.data.repository.ProductoRepository
 import com.ucne.geekmarket.data.repository.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,6 +25,27 @@ class ProductoViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow((ProductoUistate()))
     val uiState = _uiState.asStateFlow()
+
+    val laptops =  productoRepository.getProductoByCategoria("Laptop")
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+        )
+
+    val descktops = productoRepository.getProductoByCategoria("Desktop")
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+        )
+
+    val laptopsGaming = productoRepository.getProductoByCategoria("Laptop-Gaming")
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+        )
 
     fun onSetProducto(productoId: Int) {
         viewModelScope.launch {
@@ -45,6 +69,16 @@ class ProductoViewModel @Inject constructor(
 
     fun getProductos() {
 
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    laptops = laptops.value,
+                    descktops = descktops.value,
+                    laptopsGaming = laptopsGaming.value
+                )
+            }
+        }
+
         productoRepository.getProductos().onEach { result ->
             when (result) {
                 is Resource.Loading -> _uiState.update {
@@ -55,7 +89,7 @@ class ProductoViewModel @Inject constructor(
                 is Resource.Success -> _uiState.update {
                     it.copy(
                        isLoading = false,
-                        laptops = result.data?: emptyList()
+                        productos = result.data?: emptyList()
                     )
                 }
                 is Resource.Error -> _uiState.update {
@@ -67,74 +101,78 @@ class ProductoViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
     }
-    fun getProductosByCategoria() {
 
-        productoRepository.getProductos("Laptop").onEach { result ->
-            when (result) {
-                is Resource.Loading -> _uiState.update {
-                    it.copy(
-                        isLoading = true
-                    )
-                }
-                is Resource.Success -> _uiState.update {
-                    it.copy(
-                       isLoading = false,
-                        laptops = result.data?: emptyList()
-                    )
-                }
-                is Resource.Error -> _uiState.update {
-                    it.copy(
-                       isLoading = false,
-                        errorMessage = result.message
-                    )
-                }
-            }
-        }.launchIn(viewModelScope)
-
-        productoRepository.getProductos("Desktop").onEach { result ->
-            when (result) {
-                is Resource.Loading -> _uiState.update {
-                    it.copy(
-                        isLoading = true
-                    )
-                }
-                is Resource.Success -> _uiState.update {
-                    it.copy(
-                       isLoading = false,
-                        descktops = result.data?: emptyList()
-                    )
-                }
-                is Resource.Error -> _uiState.update {
-                    it.copy(
-                       isLoading = false,
-                        errorMessage = result.message
-                    )
-                }
-            }
-        }.launchIn(viewModelScope)
-
-        productoRepository.getProductos("Laptop-Gaming").onEach { result ->
-            when (result) {
-                is Resource.Loading -> _uiState.update {
-                    it.copy(
-                        isLoading = true
-                    )
-                }
-                is Resource.Success -> _uiState.update {
-                    it.copy(
-                       isLoading = false,
-                        laptopsGaming = result.data?: emptyList()
-                    )
-                }
-                is Resource.Error -> _uiState.update {
-                    it.copy(
-                       isLoading = false,
-                        errorMessage = result.message
-                    )
-                }
-            }
-        }.launchIn(viewModelScope)
-    }
+//    fun getProductosByCategoria() {
+//        viewModelScope.launch {
+//            getProductos()
+//        }
+//
+//        productoRepository.getProductos("Laptop").onEach { result ->
+//            when (result) {
+//                is Resource.Loading -> _uiState.update {
+//                    it.copy(
+//                        isLoading = true
+//                    )
+//                }
+//                is Resource.Success -> _uiState.update {
+//                    it.copy(
+//                       isLoading = false,
+//                        laptops = result.data?: emptyList()
+//                    )
+//                }
+//                is Resource.Error -> _uiState.update {
+//                    it.copy(
+//                       isLoading = false,
+//                        errorMessage = result.message
+//                    )
+//                }
+//            }
+//        }.launchIn(viewModelScope)
+//
+//        productoRepository.getProductos("Desktop").onEach { result ->
+//            when (result) {
+//                is Resource.Loading -> _uiState.update {
+//                    it.copy(
+//                        isLoading = true
+//                    )
+//                }
+//                is Resource.Success -> _uiState.update {
+//                    it.copy(
+//                       isLoading = false,
+//                        descktops = result.data?: emptyList()
+//                    )
+//                }
+//                is Resource.Error -> _uiState.update {
+//                    it.copy(
+//                       isLoading = false,
+//                        errorMessage = result.message
+//                    )
+//                }
+//            }
+//        }.launchIn(viewModelScope)
+//
+//        productoRepository.getProductos("Laptop-Gaming").onEach { result ->
+//            when (result) {
+//                is Resource.Loading -> _uiState.update {
+//                    it.copy(
+//                        isLoading = true
+//                    )
+//                }
+//                is Resource.Success -> _uiState.update {
+//                    it.copy(
+//                       isLoading = false,
+//                        laptopsGaming = result.data?: emptyList()
+//                    )
+//                }
+//                is Resource.Error -> _uiState.update {
+//                    it.copy(
+//                       isLoading = false,
+//                        errorMessage = result.message
+//                    )
+//                }
+//            }
+//        }.launchIn(viewModelScope)
+//    }
 }
 
 data class ProductoUistate(
@@ -148,9 +186,10 @@ data class ProductoUistate(
     val especificacion: String? = null,
     val isLoading: Boolean = false,
     val producto: ProductoDto? = null,
-    val laptops: List<ProductoDto> = emptyList(),
-    val descktops: List<ProductoDto> = emptyList(),
-    val laptopsGaming: List<ProductoDto> = emptyList(),
+    val laptops: List<ProductoEntity> = emptyList(),
+    val descktops: List<ProductoEntity> = emptyList(),
+    val productos: List<ProductoDto> = emptyList(),
+    val laptopsGaming: List<ProductoEntity> = emptyList(),
     val errorMessage: String? = null
 )
 
