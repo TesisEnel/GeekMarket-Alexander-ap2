@@ -16,7 +16,6 @@ interface CarritoDao {
     @Delete
     suspend fun delete(carrito: CarritoEntity)
 
-
     @Query(
         """
             SELECT * 

@@ -22,6 +22,7 @@ import com.ucne.geekmarket.presentation.components.BottonBar
 fun GeekMarketNavHost(
     navHostController: NavHostController,
 ) {
+    //Mover el Scaffold a otro lugar TODO
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         TopAppBar(
             title = {

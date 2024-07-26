@@ -29,6 +29,8 @@ interface ProductoDao {
     @Query("SELECT * FROM productos")
     fun getAll(): Flow<List<ProductoEntity>>
 
+
+
     @Query(
         """
             SELECT p.*

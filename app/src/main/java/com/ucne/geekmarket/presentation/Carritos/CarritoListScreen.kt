@@ -43,6 +43,7 @@ fun CarritoListScreen(
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val items by viewModel.items.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.getLastCarrito()
@@ -50,6 +51,7 @@ fun CarritoListScreen(
 
     CarritoListScreenBody(
         uiState = uiState,
+        items = items,
         innerPadding = innerPadding,
         onRemoveItem = viewModel::deleteItem,
         calcularTotal = { viewModel.calcularTotal() }
@@ -61,7 +63,8 @@ fun CarritoListScreenBody(
     uiState: carritoUistate,
     innerPadding: PaddingValues,
     onRemoveItem: (ItemEntity) -> Unit,
-    calcularTotal: () -> Unit
+    calcularTotal: () -> Unit,
+    items: List<ItemEntity>
 ) {
 
     LazyColumn(modifier = Modifier.padding(innerPadding)) {
@@ -142,7 +145,7 @@ fun CartItemCard(
                         }
                     }
                     Text(
-                        text = "Monto: ${uiState.total}",
+                        text = "Monto: ${item.monto}",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }

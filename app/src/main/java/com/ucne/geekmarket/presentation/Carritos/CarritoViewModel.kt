@@ -12,6 +12,8 @@ import com.ucne.geekmarket.data.repository.ProductoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -64,31 +66,43 @@ class CarritoViewModel @Inject constructor(
 
     }
 
-//    fun pagarTodosLosCarritos(){
-//        viewModelScope.launch {
-//            carritos.value.forEach { c->
-//                    c.update {
-//                        it.copy(
-//                            pagado = true
-//                        )
-//                    }
-//                }
-//            }
-//    }
-
     fun onAddItem(item: ItemEntity) {
         viewModelScope.launch {
-
-            itemRepository.saveItem(ItemEntity(
-                carritoId = uiState.value.carritoId,
-                productoId = item.productoId,
-                cantidad = item.cantidad,
-            ))
-            uiState.update {
-                it.copy(items = items.value)
+            val existe = uiState.value.items?.any { it.productoId == item.productoId }
+            val producto = productoRepository.getProducto(item.productoId ?: 0)
+            val monto = (item.cantidad?.toDouble() ?: 0.0) * (producto?.precio ?: 0.0)
+            if (existe == false) {
+                itemRepository.saveItem(
+                    ItemEntity(
+                        carritoId = uiState.value.carritoId,
+                        productoId = item.productoId,
+                        cantidad = item.cantidad,
+                        monto = monto
+                    )
+                )
+                uiState.update {
+                    it.copy(items = items.value)
+                }
+                calcularTotal()
+            } else {
+                val itemsRepetido =
+                    uiState.value.items?.filter { it.productoId == item.productoId }?.firstOrNull()
+                itemRepository.saveItem(
+                    ItemEntity(
+                        itemId = itemsRepetido?.itemId,
+                        carritoId = uiState.value.carritoId,
+                        productoId = item.productoId,
+                        cantidad = item.cantidad?.plus((itemsRepetido?.cantidad ?: 0)),
+                        monto = (item.cantidad?.toDouble() ?: 0.0) * (producto?.precio ?: 0.0)
+                    )
+                )
+                uiState.update {
+                    it.copy(items = items.value)
+                }
+                calcularTotal()
             }
-            saveCarrito()
         }
+
     }
 
     fun getLastCarrito() {
@@ -96,11 +110,12 @@ class CarritoViewModel @Inject constructor(
             val lastCarrito = carritoRepository.getLastCarrito()
             val productoList = productoRepository.getProductosItem(lastCarrito?.carritoId ?: 0)
             val itemList = itemRepository.carritoItems(lastCarrito?.carritoId ?: 0)
-            if (lastCarrito?.pagado == false) {
+            val total = items.value.sumOf { it.monto ?: 0.0 }
+            if (lastCarrito?.pagado == false && (lastCarrito.carritoId ?: 0) > 0) {
                 uiState.update {
                     it.copy(
                         carritoId = lastCarrito.carritoId,
-                        total = lastCarrito.total,
+                        total = total,
                         personaId = lastCarrito.personaId,
                         pagado = lastCarrito.pagado,
                         items = itemList,
@@ -109,9 +124,10 @@ class CarritoViewModel @Inject constructor(
                 }
 
             }
-//            if(lastCarrito?.carritoId == 0 || lastCarrito == null){
-                saveCarrito()
-//            }
+//            calcularTotal()
+
+
+
 
         }
     }
@@ -119,9 +135,7 @@ class CarritoViewModel @Inject constructor(
     //Esta mal TODO
     fun calcularTotal() {
         viewModelScope.launch {
-            val productoList = productoRepository.getProductosItem(uiState.value.carritoId ?: 0)
-            val total = productoList.sumOf { (it.stock ) * (it.precio ) }
-
+            val total = items.value.sumOf { (it.monto ?: 0.0) }
             uiState.update {
                 it.copy(
                     total = total
@@ -134,13 +148,12 @@ class CarritoViewModel @Inject constructor(
     fun saveCarrito() {
         viewModelScope.launch {
             val productoList = productoRepository.getProductosItem(uiState.value.carritoId ?: 0)
-
-            val monto = productoList.sumOf { (it.stock ) * (it.precio ) }
+            val total = items.value.sumOf { (it.monto ?: 0.0) }
             uiState.update {
                 it.copy(
                     carritoId = uiState.value.carritoId,
                     personaId = 1,
-                    total = monto,
+                    total = total,
                     pagado = false,
                 )
             }
@@ -169,9 +182,9 @@ class CarritoViewModel @Inject constructor(
     }
 
     fun deleteItem(item: ItemEntity) {
-       viewModelScope.launch {
-           itemRepository.deleteItem(item)
-       }
+        viewModelScope.launch {
+            itemRepository.deleteItem(item)
+        }
 
 //        saveCarrito()
     }

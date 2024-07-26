@@ -18,7 +18,7 @@ import com.ucne.geekmarket.data.local.entities.ProductoEntity
         PersonaEntity::class,
         ItemEntity::class],
 
-    version = 6,
+    version = 8,
     exportSchema = false
 )
 //@TypeConverters(ListConverter::class)

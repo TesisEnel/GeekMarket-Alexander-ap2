@@ -14,17 +14,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -37,7 +33,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -45,39 +40,38 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.ucne.geekmarket.data.local.entities.ItemEntity
 import com.ucne.geekmarket.data.local.entities.ProductoEntity
-import com.ucne.geekmarket.data.remote.dto.ProductoDto
 import com.ucne.geekmarket.presentation.Carritos.CarritoViewModel
-import com.ucne.geekmarket.presentation.Carritos.carritoUistate
 
 
 @Composable
 fun ProductoListScreen(
     viewModel: ProductoViewModel = hiltViewModel(),
-    viewModelCarrito: CarritoViewModel = hiltViewModel(),
+    //TODO: Quitar el carritoViewModel, por el  principio de responsabilidad unica
     onVerProducto: (ProductoEntity) -> Unit,
     innerPadding: PaddingValues,
 
     ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val uiStateCarrito by viewModelCarrito.uiState.collectAsStateWithLifecycle()
     val laptops = viewModel.laptops.collectAsStateWithLifecycle()
     val laptopsGaming = viewModel.laptopsGaming.collectAsStateWithLifecycle()
     val desktops = viewModel.descktops.collectAsStateWithLifecycle()
+//    val items = viewModelCarrito.items.collectAsStateWithLifecycle()
+
 
 
     LaunchedEffect(Unit) {
-//        viewModel.getProductosByCategoria()
         viewModel.getProductos()
-        viewModelCarrito.getLastCarrito()
+//        viewModelCarrito.getLastCarrito()
     }
     ProductoListBody(
         laptops =   laptops.value,
         laptopsGaming = laptopsGaming.value,
         desktops = desktops.value,
+//        items = items.value,
         onVerProducto = onVerProducto,
         innerPadding = innerPadding,
-        onAddItem = viewModelCarrito::onAddItem,
+        onAddItem = viewModel::onAddItem,
     )
 }
 
@@ -89,9 +83,10 @@ fun ProductoListBody(
     onVerProducto: (ProductoEntity) -> Unit,
     innerPadding: PaddingValues,
     onAddItem: (ItemEntity) -> Unit,
+//    items: List<ItemEntity>,
 ) {
 
-    var cantidad by remember { mutableStateOf(0) }
+    var cantidad by remember { mutableStateOf(1) }
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -246,7 +241,7 @@ fun ProductCard(producto: ProductoEntity, onAddToCart: (ItemEntity) -> Unit) {
             .padding(1.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
-        var cantidad by remember { mutableStateOf(0) }
+        var cantidad by remember { mutableStateOf(1) }
         IconButton(
             onClick = { onAddToCart(ItemEntity(productoId = producto.productoId, cantidad = cantidad)) },
             modifier = Modifier
@@ -278,7 +273,7 @@ fun ProductCard(producto: ProductoEntity, onAddToCart: (ItemEntity) -> Unit) {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Row {
-                IconButton(onClick = { cantidad-- }, enabled = cantidad > 0) {
+                IconButton(onClick = { cantidad-- }, enabled = cantidad > 1) {
                     Icon(
                         imageVector = Icons.Default.Remove,
                         contentDescription = "Decrease Quantity"
@@ -294,67 +289,3 @@ fun ProductCard(producto: ProductoEntity, onAddToCart: (ItemEntity) -> Unit) {
         }
     }
 }
-
-//
-//@Composable
-//fun CartItemCard(
-//    item: Items,
-//    onIncreaseQuantity: () -> Unit,
-//    onDecreaseQuantity: () -> Unit,
-//    onRemoveItem: (Int) -> Unit
-//) {
-//    Card(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .padding(8.dp),
-//        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-//    ) {
-//        Row(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(16.dp),
-//            verticalAlignment = Alignment.CenterVertically
-//        ) {
-//            // Product Image (If available)
-//            item.producto?.imagen?.let { imageUrl ->
-//                AsyncImage(
-//                    model = imageUrl,
-//                    contentDescription = item.producto?.nombre ?: "",
-//                    modifier = Modifier
-//                        .size(80.dp)
-//                        .clip(RoundedCornerShape(8.dp))
-//                )
-//                Spacer(modifier = Modifier.width(16.dp))
-//            }
-//
-//            // Product DetailsColumn(modifier = Modifier.weight(1f)) {
-//            Text(
-//                text = item.producto?.nombre ?: "",
-//                style = MaterialTheme.typography.titleMedium,
-//                fontWeight = FontWeight.Bold
-//            )
-//            Spacer(modifier = Modifier.height(4.dp))
-//            Text(
-//                text = "Price: $${item.producto?.precio ?: 0}",
-//                style = MaterialTheme.typography.bodyMedium,
-//
-//                )
-//        }
-//
-//        // Quantity Controls
-//        Column {
-//            IconButton(onClick = onIncreaseQuantity) {
-//                Icon(imageVector = Icons.Default.Add, contentDescription = "Increase Quantity")
-//            }
-//            Text(text = "Qty: ${item.cantidad ?: 0}")
-//            IconButton(onClick = onDecreaseQuantity, enabled = (item.cantidad ?: 0) > 0) {
-//                Icon(imageVector = Icons.Default.Remove, contentDescription = "Decrease Quantity")
-//            }
-//        }
-//
-//        // Remove Item Button
-//        IconButton(onClick = onRemoveItem) {
-//            Icon(imageVector = Icons.Default.Delete, contentDescription = "Remove Item")
-//        }
-//    }
-//}

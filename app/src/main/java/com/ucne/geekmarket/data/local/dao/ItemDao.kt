@@ -5,7 +5,6 @@ import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
 import com.ucne.geekmarket.data.local.entities.ItemEntity
-import com.ucne.geekmarket.data.local.entities.PersonaEntity
 import kotlinx.coroutines.flow.Flow
 
 
@@ -26,6 +25,7 @@ interface ItemDao {
         """
     )
     suspend fun find(id: Int): ItemEntity?
+
     @Query(
         """
             SELECT * 
@@ -34,6 +34,33 @@ interface ItemDao {
         """
     )
     suspend fun CarritoItem(id: Int): List<ItemEntity>?
+
+    @Query(
+        """ 
+        SELECT * 
+        FROM Items 
+        WHERE productoId = :productoId AND carritoId = :carritoId 
+        LIMIT 1
+        """
+    )
+    suspend fun findItemByProducto(productoId: Int, carritoId: Int): ItemEntity?
+
+
+    @Query(
+        """
+            SELECT EXISTS 
+                (SELECT 1 
+                 FROM Items 
+                 WHERE productoId = :productoId AND carritoId = :carritoId)
+        """
+    )
+    suspend fun itemExit(productoId: Int, carritoId: Int): Boolean
+    @Query("""
+        UPDATE Carritos
+        SET total = :total
+        WHERE carritoId = :carritoId
+    """)
+    suspend fun calcularTotal(carritoId: Int , total: Double)
 
     @Query("SELECT * FROM Items")
     fun getAll(): Flow<List<ItemEntity>>

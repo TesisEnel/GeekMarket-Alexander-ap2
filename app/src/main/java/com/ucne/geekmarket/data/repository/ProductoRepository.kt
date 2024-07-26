@@ -19,6 +19,13 @@ class ProductoRepository @Inject constructor(
 
     fun getProductoByCategoria(categoria: String) = productoDao.getProductoByCategoria(categoria)
 
+    suspend fun getApiToDb(){
+        val productos = productoApi.getProductos()
+        productos.forEach {
+            productoDao.save(it.toEntity())
+        }
+    }
+
     fun getProductos(): Flow<Resource<List<ProductoDto>>> = flow {
 
         emit(Resource.Loading())
@@ -71,15 +78,8 @@ class ProductoRepository @Inject constructor(
 
         }
     }
+    suspend fun getProducto(id: Int) = productoDao.find(id)
 
-    suspend fun getProducto(id: Int): ProductoDto? {
-        return try {
-            productoApi.getProducto(id)
-        } catch (e: Exception) {
-            e.message?.let { Log.e( "Error", it) }
-            null
-        }
-    }
 
 }
 
