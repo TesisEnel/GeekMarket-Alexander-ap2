@@ -10,6 +10,8 @@ sealed class Screen {
     @Serializable
     data object CarritoList : Screen()
     @Serializable
+    data object Profile : Screen()
+    @Serializable
     data class ProductDetail(val productoId: Int) : Screen()
 
 }

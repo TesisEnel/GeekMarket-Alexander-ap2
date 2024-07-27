@@ -20,7 +20,6 @@ import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.ShoppingCart
-import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,7 +27,6 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,7 +49,7 @@ import com.ucne.geekmarket.ui.theme.SecondaryColor
 import com.ucne.geekmarket.ui.theme.ThinTextColor
 
 @Composable
-fun BottonBar(goToListaProducto: () -> Unit, goToCarrito: () -> Unit) {
+fun BottonBar(goToListaProducto: () -> Unit, goToCarrito: () -> Unit, currentRoute: String?) {
     val viewModel: CarritoViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
 //    LaunchedEffect(Unit) {
@@ -60,10 +58,13 @@ fun BottonBar(goToListaProducto: () -> Unit, goToCarrito: () -> Unit) {
     Box(contentAlignment = Alignment.BottomCenter){
         NavigationBar(
             modifier = Modifier
+                .height(80.dp)
                 .clip(
                     RoundedCornerShape(
                         topStart = 30.dp,
                         topEnd = 30.dp,
+                        bottomStart = 30.dp,
+                        bottomEnd = 30.dp
                     )
                 )
                 .background(CardColor)
@@ -75,41 +76,45 @@ fun BottonBar(goToListaProducto: () -> Unit, goToCarrito: () -> Unit) {
                     selectedIcon = Icons.Filled.ShoppingCart,
                     unselectedIcon = Icons.Outlined.ShoppingCart,
                     hasNews = false,
-                    badgeCount = 45
+                    badgeCount = 45,
+                    direction = Screen.CarritoList.toString()
                 ),
                 ButtomNavigationItem(
                     title = "Home",
                     selectedIcon = Icons.Filled.Home,
                     unselectedIcon = Icons.Outlined.Home,
-                    hasNews = false
+                    hasNews = false,
+                    direction = Screen.ProductList.toString()
                 ),
                 ButtomNavigationItem(
                     title = "Profile",
                     selectedIcon = Icons.Filled.Person,
                     unselectedIcon = Icons.Outlined.Person,
-                    hasNews = false
+                    hasNews = false,
+                    direction = Screen.Profile.toString()
                 ),
 
 
                 )
-            var selectedeItemIndex by rememberSaveable {
-                mutableStateOf(1)
+            //TODO: Arreglar que cando les das a back se ponga el icono correcto
+            var selectedeDirection by rememberSaveable {
+                mutableStateOf(currentRoute?: Screen.ProductList.toString())
             }
 
-            items.forEachIndexed { index, item ->
+            items.forEach {  item ->
+
+
                 NavigationBarItem(
-                    modifier = Modifier.align(Alignment.Bottom).height(60.dp),
+                    modifier = Modifier.align(Alignment.Bottom).padding(top = 30.dp),
                     alwaysShowLabel = false,
-                    selected = selectedeItemIndex == index,
+                    selected = item.direction == selectedeDirection,
                     onClick = {
-                        selectedeItemIndex = index
-                        when(selectedeItemIndex){
-                            0 -> {goToCarrito()}
-                            1 -> goToListaProducto()
+                        selectedeDirection = item.direction?: ""
+                        when(selectedeDirection){
+                            Screen.CarritoList.toString() -> {goToCarrito()}
+                            Screen.ProductList.toString() -> goToListaProducto()
                             else -> goToListaProducto()
-//                            2 -> { TODO()}
                         }
-    //                                    navController.navigate(item.title)
                     },
                     label = {
                         Text(text = item.title)
@@ -117,17 +122,18 @@ fun BottonBar(goToListaProducto: () -> Unit, goToCarrito: () -> Unit) {
                     icon = {
                         BadgedBox(
                             badge = {
-                                if(index == 0){
-                                    if (uiState.items?.isNotEmpty() == true) {
-                                        Badge {
-                                            Text(text = uiState.items?.size.toString())
-                                        }
-                                    }
-                                }
+//                                if(index == 0){
+//                                    if (uiState.items?.isNotEmpty() == true) {
+//                                        Badge {
+//                                            Text(text = uiState.items?.size.toString())
+//                                        }
+//                                    }
+//                                }
                             }
                         ) {
+
                             Icon(
-                                imageVector = if (index == selectedeItemIndex)
+                                imageVector = if (item.direction == selectedeDirection)
                                     item.selectedIcon
                                 else
                                     item.unselectedIcon,

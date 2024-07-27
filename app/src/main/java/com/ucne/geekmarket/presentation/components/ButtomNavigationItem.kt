@@ -7,5 +7,6 @@ data class ButtomNavigationItem (
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector,
     val hasNews: Boolean,
-    val badgeCount: Int? = null
+    val badgeCount: Int? = null,
+    val direction: String? = null
 )

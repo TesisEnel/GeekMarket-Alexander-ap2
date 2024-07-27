@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -41,34 +42,24 @@ import coil.compose.AsyncImage
 import com.ucne.geekmarket.data.local.entities.ItemEntity
 import com.ucne.geekmarket.data.local.entities.ProductoEntity
 import com.ucne.geekmarket.presentation.Carritos.CarritoViewModel
+import com.ucne.geekmarket.presentation.Common.formatNumber
 
 
 @Composable
 fun ProductoListScreen(
     viewModel: ProductoViewModel = hiltViewModel(),
-    //TODO: Quitar el carritoViewModel, por el  principio de responsabilidad unica
     onVerProducto: (ProductoEntity) -> Unit,
     innerPadding: PaddingValues,
+) {
 
-    ) {
-
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val laptops = viewModel.laptops.collectAsStateWithLifecycle()
     val laptopsGaming = viewModel.laptopsGaming.collectAsStateWithLifecycle()
     val desktops = viewModel.descktops.collectAsStateWithLifecycle()
-//    val items = viewModelCarrito.items.collectAsStateWithLifecycle()
 
-
-
-    LaunchedEffect(Unit) {
-        viewModel.getProductos()
-//        viewModelCarrito.getLastCarrito()
-    }
     ProductoListBody(
-        laptops =   laptops.value,
+        laptops = laptops.value,
         laptopsGaming = laptopsGaming.value,
         desktops = desktops.value,
-//        items = items.value,
         onVerProducto = onVerProducto,
         innerPadding = innerPadding,
         onAddItem = viewModel::onAddItem,
@@ -83,7 +74,6 @@ fun ProductoListBody(
     onVerProducto: (ProductoEntity) -> Unit,
     innerPadding: PaddingValues,
     onAddItem: (ItemEntity) -> Unit,
-//    items: List<ItemEntity>,
 ) {
 
     var cantidad by remember { mutableStateOf(1) }
@@ -131,7 +121,7 @@ fun ProductoListBody(
                                 ProductCard(
                                     producto = item,
                                     onAddToCart = onAddItem,
-                                    )
+                                )
 
 
                             }
@@ -177,7 +167,7 @@ fun ProductoListBody(
                                 ProductCard(
                                     producto = item,
                                     onAddToCart = onAddItem,
-                                    )
+                                )
 
                             }
                         }
@@ -237,22 +227,10 @@ fun ProductCard(producto: ProductoEntity, onAddToCart: (ItemEntity) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(410.dp)
+            .height(380.dp)
             .padding(1.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
-        var cantidad by remember { mutableStateOf(1) }
-        IconButton(
-            onClick = { onAddToCart(ItemEntity(productoId = producto.productoId, cantidad = cantidad)) },
-            modifier = Modifier
-                .align(Alignment.End)
-                .size(30.dp)
-        )
-        {
-            Icon(imageVector = Icons.Default.AddCircle, contentDescription = "Agregar al carrito")
-        }
-
-
         Column(
             modifier = Modifier
                 .padding(16.dp)
@@ -272,20 +250,8 @@ fun ProductCard(producto: ProductoEntity, onAddToCart: (ItemEntity) -> Unit) {
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Row {
-                IconButton(onClick = { cantidad-- }, enabled = cantidad > 1) {
-                    Icon(
-                        imageVector = Icons.Default.Remove,
-                        contentDescription = "Decrease Quantity"
-                    )
-                }
-                Text(text = "$cantidad")
-                IconButton(onClick = { cantidad++ }) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "Increase Quantity")
-                }
-            }
-            Text(text = "Descripción: ${producto.especificacion}", maxLines = 4)
-            Text(text = "Precio: ${producto.precio}")
+            Text(text = "Descripción: ${producto.especificacion}", maxLines = 3)
+            Text(text = "Precio: ${formatNumber(producto.precio)}")
         }
     }
 }

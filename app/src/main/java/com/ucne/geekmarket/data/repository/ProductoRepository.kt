@@ -17,12 +17,17 @@ class ProductoRepository @Inject constructor(
 
     suspend fun getProductosItem(id: Int)= productoDao.getProductoItem(id)
 
+    //TODO: Ver si puedo hacer que se carguen los productos de la api desde esta funcion
     fun getProductoByCategoria(categoria: String) = productoDao.getProductoByCategoria(categoria)
 
     suspend fun getApiToDb(){
-        val productos = productoApi.getProductos()
-        productos.forEach {
-            productoDao.save(it.toEntity())
+        try {
+            val productos = productoApi.getProductos()
+            productos.forEach {
+                productoDao.save(it.toEntity())
+            }
+        }catch (e: Exception){
+            Log.e("Error", e.message.toString())
         }
     }
 

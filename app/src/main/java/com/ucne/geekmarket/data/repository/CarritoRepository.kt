@@ -16,7 +16,6 @@ class CarritoRepository @Inject constructor(
 
     suspend fun getLastCarrito()= carritoDao.getLastRecord()
 
-
     fun getCarritos()= carritoDao.getAll()
 
 }

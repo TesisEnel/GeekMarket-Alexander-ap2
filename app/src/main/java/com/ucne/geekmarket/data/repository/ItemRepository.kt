@@ -1,6 +1,7 @@
 package com.ucne.geekmarket.data.repository
 
 import com.ucne.geekmarket.data.local.dao.ItemDao
+import com.ucne.geekmarket.data.local.entities.CarritoEntity
 import com.ucne.geekmarket.data.local.entities.ItemEntity
 import javax.inject.Inject
 
@@ -25,11 +26,15 @@ class ItemRepository @Inject constructor(
         itemDao.findItemByProducto(productoId, carritoId)
 
     suspend fun AddItem(item: ItemEntity) {
-        val lastCarrito = carritoRepository.getLastCarrito()
+        var lastCarrito = carritoRepository.getLastCarrito()
+        if(lastCarrito == null){
+            carritoRepository.saveCarrito(CarritoEntity(personaId = 1, pagado = false))
+            lastCarrito = carritoRepository.getLastCarrito()
+        }
         val existe = itemExist(item.productoId ?: 0, lastCarrito?.carritoId ?: 0)
         val producto = productoRepository.getProducto(item.productoId ?: 0)
-        val monto = (item.cantidad?.toDouble() ?: 0.0) * (producto?.precio ?: 0.0)
         if (existe == false) {
+            val monto = (item.cantidad?.toDouble() ?: 0.0) * (producto?.precio ?: 0.0)
             saveItem(
                 ItemEntity(
                     carritoId = lastCarrito?.carritoId,
@@ -40,22 +45,21 @@ class ItemRepository @Inject constructor(
             )
         } else {
             val itemsRepetido = getItemByProducto(item.productoId ?: 0, lastCarrito?.carritoId ?: 0)
+            val cantidad = (itemsRepetido?.cantidad?: 0) + (item.cantidad ?: 0)
+            val monto = cantidad * (producto?.precio ?: 0.0)
             saveItem(
                 ItemEntity(
                     itemId = itemsRepetido?.itemId,
                     carritoId = lastCarrito?.carritoId,
                     productoId = item.productoId,
-                    cantidad = item.cantidad?.plus((itemsRepetido?.cantidad ?: 0)),
-                    monto = (item.cantidad?.toDouble() ?: 0.0) * (producto?.precio ?: 0.0)
+                    cantidad = cantidad,
+                    monto = monto
                 )
             )
-//            calcularTotal()
         }
         val items = carritoItems(lastCarrito?.carritoId?:0)
         val total = items?.sumOf { (it.monto ?: 0.0)  }
         itemDao.calcularTotal(lastCarrito?.carritoId ?: 0, total ?: 0.0)
-
-
     }
 
     fun getItem() = itemDao.getAll()

@@ -23,7 +23,7 @@ fun CenteredTextDivider(text: String) {
                 .weight(1f)
                 .padding(end = 8.dp)
         )
-        Text(text = text)
+        Text(text = text?: "0.0 ")
         HorizontalDivider(
             modifier = Modifier
                 .weight(1f)

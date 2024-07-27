@@ -5,7 +5,6 @@ import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
 import com.ucne.geekmarket.data.local.entities.CarritoEntity
-import com.ucne.geekmarket.data.local.entities.ProductoEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

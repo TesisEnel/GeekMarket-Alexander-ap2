@@ -32,6 +32,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.ucne.geekmarket.data.local.entities.ItemEntity
+import com.ucne.geekmarket.presentation.Common.formatNumber
 import com.ucne.geekmarket.presentation.Productos.ProductoViewModel
 import com.ucne.geekmarket.presentation.components.CenteredTextDivider
 
@@ -39,15 +40,10 @@ import com.ucne.geekmarket.presentation.components.CenteredTextDivider
 fun CarritoListScreen(
     innerPadding: PaddingValues,
     viewModel: CarritoViewModel = hiltViewModel(),
-    productoViewModel: ProductoViewModel = hiltViewModel(),
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val items by viewModel.items.collectAsStateWithLifecycle()
-
-    LaunchedEffect(Unit) {
-        viewModel.getLastCarrito()
-    }
 
     CarritoListScreenBody(
         uiState = uiState,
@@ -78,7 +74,7 @@ fun CarritoListScreenBody(
         }
         item {
             val total = uiState.total
-            CenteredTextDivider(text = "Total: ${total} ")
+            CenteredTextDivider(text = "Total: $${formatNumber(total)} ")
         }
     }
 
@@ -124,12 +120,13 @@ fun CartItemCard(
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Precio: $${producto?.precio ?: 0}",
+                            text = "$${formatNumber(producto?.precio)}",
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Text(
-                            text = "x:${item.cantidad ?: 0}",
-                            style = MaterialTheme.typography.bodyMedium
+                            text = "x${formatNumber(item.cantidad?.toDouble())}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(start = 8.dp)
                         )
                         IconButton(
                             onClick = {
@@ -145,7 +142,7 @@ fun CartItemCard(
                         }
                     }
                     Text(
-                        text = "Monto: ${item.monto}",
+                        text = "Monto: ${formatNumber( item.monto)}",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
