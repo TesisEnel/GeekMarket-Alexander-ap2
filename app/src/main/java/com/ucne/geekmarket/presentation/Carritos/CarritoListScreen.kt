@@ -21,7 +21,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,12 +32,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.ucne.geekmarket.data.local.entities.ItemEntity
 import com.ucne.geekmarket.presentation.Common.formatNumber
-import com.ucne.geekmarket.presentation.Productos.ProductoViewModel
 import com.ucne.geekmarket.presentation.components.CenteredTextDivider
 
 @Composable
 fun CarritoListScreen(
     innerPadding: PaddingValues,
+    deleteAllowed: Boolean,
     viewModel: CarritoViewModel = hiltViewModel(),
 ) {
 
@@ -50,7 +49,8 @@ fun CarritoListScreen(
         items = items,
         innerPadding = innerPadding,
         onRemoveItem = viewModel::deleteItem,
-        calcularTotal = { viewModel.calcularTotal() }
+        calcularTotal = { viewModel.calcularTotal() },
+        deleteAllowed = deleteAllowed
     )
 }
 
@@ -60,7 +60,8 @@ fun CarritoListScreenBody(
     innerPadding: PaddingValues,
     onRemoveItem: (ItemEntity) -> Unit,
     calcularTotal: () -> Unit,
-    items: List<ItemEntity>
+    items: List<ItemEntity>,
+    deleteAllowed: Boolean
 ) {
 
     LazyColumn(modifier = Modifier.padding(innerPadding)) {
@@ -69,7 +70,8 @@ fun CarritoListScreenBody(
                 uiState = uiState,
                 item = item,
                 onRemoveItem = onRemoveItem,
-                calcularTotal = calcularTotal
+                calcularTotal = calcularTotal,
+                deleteAllowed = deleteAllowed
             )
         }
         item {
@@ -85,7 +87,8 @@ fun CartItemCard(
     uiState: carritoUistate,
     calcularTotal: () -> Unit,
     item: ItemEntity,
-    onRemoveItem: (ItemEntity) -> Unit
+    onRemoveItem: (ItemEntity) -> Unit,
+    deleteAllowed: Boolean
 ) {
     Card(
         modifier = Modifier
@@ -128,17 +131,19 @@ fun CartItemCard(
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.padding(start = 8.dp)
                         )
-                        IconButton(
-                            onClick = {
-                                onRemoveItem(item)
-                                calcularTotal()
-                            },
-                            modifier = Modifier.padding(1.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "Remove Item"
-                            )
+                        if(deleteAllowed){
+                            IconButton(
+                                onClick = {
+                                    onRemoveItem(item)
+                                    calcularTotal()
+                                },
+                                modifier = Modifier.padding(1.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "Remove Item"
+                                )
+                            }
                         }
                     }
                     Text(
