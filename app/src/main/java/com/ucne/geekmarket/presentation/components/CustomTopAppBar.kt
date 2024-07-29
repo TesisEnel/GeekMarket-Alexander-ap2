@@ -18,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
@@ -31,6 +32,7 @@ fun CustomTopAppBar(lable: String, topBarAction: () -> Unit, isInCarrito: Boolea
         title = {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
+                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = lable)
@@ -57,7 +59,7 @@ fun CustomTopAppBar(lable: String, topBarAction: () -> Unit, isInCarrito: Boolea
                 }
             }
         },
-        modifier = Modifier.height(60.dp)
+        modifier = Modifier.height(70.dp)
 
     )
 }

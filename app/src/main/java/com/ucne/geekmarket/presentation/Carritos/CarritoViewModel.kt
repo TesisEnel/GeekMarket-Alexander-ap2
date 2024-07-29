@@ -76,28 +76,18 @@ class CarritoViewModel @Inject constructor(
         }
     }
 
-    //Esta mal TODO
-    fun calcularTotal() {
+
+
+    fun saveCarrito() {
         viewModelScope.launch {
             val lastCarrito = carritoRepository.getLastCarrito()
             val itemList = itemRepository.carritoItems(lastCarrito?.carritoId ?: 0)
             val total = itemList?.sumOf { (it.monto ?: 0.0) }
             _uiState.update {
                 it.copy(
-                    total = total
-                )
-            }
-            saveCarrito()
-        }
-    }
-
-    fun saveCarrito() {
-        viewModelScope.launch {
-            _uiState.update {
-                it.copy(
                     carritoId = uiState.value.carritoId,
                     personaId = 1,
-                    total = uiState.value.total,
+                    total = total,
                     pagado = false,
                 )
             }
@@ -115,7 +105,7 @@ class CarritoViewModel @Inject constructor(
                 )
             }
         }
-
+        saveCarrito()
     }
 }
 

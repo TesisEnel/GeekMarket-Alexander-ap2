@@ -62,11 +62,18 @@ fun GeekMarketNavHost(
                     onVerProducto = {
                         navHostController.navigate(
                             Screen.ProductDetail(
-                                it.productoId ?: 0
+                                it.productoId
                             )
                         )
                     },
                     innerPadding = innerPadding,
+                    goToProduct = {
+                        navHostController.navigate(
+                            Screen.ProductDetail(
+                                it.productoId
+                            )
+                        )
+                    }
                 )
                 isInCarrito = false
             }

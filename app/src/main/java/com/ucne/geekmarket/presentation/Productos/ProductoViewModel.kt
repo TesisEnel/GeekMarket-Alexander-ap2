@@ -5,10 +5,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ucne.geekmarket.data.local.entities.ItemEntity
 import com.ucne.geekmarket.data.local.entities.ProductoEntity
+import com.ucne.geekmarket.data.local.entities.PromocionEntity
 import com.ucne.geekmarket.data.remote.dto.ProductoDto
+import com.ucne.geekmarket.data.remote.dto.PromocionDto
 import com.ucne.geekmarket.data.repository.CarritoRepository
 import com.ucne.geekmarket.data.repository.ItemRepository
 import com.ucne.geekmarket.data.repository.ProductoRepository
+import com.ucne.geekmarket.data.repository.PromcionRepository
 import com.ucne.geekmarket.data.repository.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +27,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ProductoViewModel @Inject constructor(
     private val productoRepository: ProductoRepository,
-    private val itemRepository: ItemRepository
+    private val itemRepository: ItemRepository,
+    private val promocionRepository: PromcionRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow((ProductoUistate()))
@@ -58,6 +62,13 @@ class ProductoViewModel @Inject constructor(
             initialValue = emptyList()
         )
 
+    val promociones = promocionRepository.getPromocionesDb()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+        )
+
     fun onAddItem(item: ItemEntity) {
         viewModelScope.launch {
             itemRepository.AddItem(item)
@@ -66,6 +77,7 @@ class ProductoViewModel @Inject constructor(
 
     init {
         getProductos()
+        getPromociones()
     }
 
     fun getProductos() {
@@ -73,7 +85,19 @@ class ProductoViewModel @Inject constructor(
             productoRepository.getApiToDb()
         }
     }
+    fun getPromociones() {
+        viewModelScope.launch {
+            promocionRepository.getApiToDb()
+            _uiState.update {
+                it.copy(
+                    promociones = promociones.value
+                )
+            }
+        }
+    }
+
 }
+
 
 data class ProductoUistate(
     val productoId: Int? = null,
@@ -90,6 +114,7 @@ data class ProductoUistate(
     val descktops: List<ProductoEntity> = emptyList(),
     val productos: List<ProductoDto> = emptyList(),
     val laptopsGaming: List<ProductoEntity> = emptyList(),
+    val promociones: List<PromocionEntity> = emptyList(),
     val errorMessage: String? = null
 )
 

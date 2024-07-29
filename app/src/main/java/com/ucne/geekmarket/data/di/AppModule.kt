@@ -7,6 +7,7 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.ucne.geekmarket.data.local.database.GeekMarketDb
 import com.ucne.geekmarket.data.remote.ProductoApi
+import com.ucne.geekmarket.data.remote.PromocionApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,6 +40,16 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun providePromocionApi(moshi: Moshi): PromocionApi {
+        return Retrofit.Builder()
+            .baseUrl("https://ap2ticket.azurewebsites.net/")
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
+            .create(PromocionApi::class.java)
+    }
+
+    @Provides
+    @Singleton
     fun provideGeekMarketDb(@ApplicationContext appContext: Context): GeekMarketDb {
         return Room.databaseBuilder(
             appContext,
@@ -59,5 +70,7 @@ object AppModule {
 
     @Provides
     fun providePersona(database: GeekMarketDb) = database.personaDao()
+    @Provides
+    fun privedePromocionDao(database: GeekMarketDb) = database.promocionDao()
 
 }

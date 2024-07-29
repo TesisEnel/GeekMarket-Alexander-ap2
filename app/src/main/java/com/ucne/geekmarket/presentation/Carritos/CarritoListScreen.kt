@@ -49,7 +49,6 @@ fun CarritoListScreen(
         items = items,
         innerPadding = innerPadding,
         onRemoveItem = viewModel::deleteItem,
-        calcularTotal = { viewModel.calcularTotal() },
         deleteAllowed = deleteAllowed
     )
 }
@@ -59,7 +58,6 @@ fun CarritoListScreenBody(
     uiState: carritoUistate,
     innerPadding: PaddingValues,
     onRemoveItem: (ItemEntity) -> Unit,
-    calcularTotal: () -> Unit,
     items: List<ItemEntity>,
     deleteAllowed: Boolean
 ) {
@@ -70,7 +68,6 @@ fun CarritoListScreenBody(
                 uiState = uiState,
                 item = item,
                 onRemoveItem = onRemoveItem,
-                calcularTotal = calcularTotal,
                 deleteAllowed = deleteAllowed
             )
         }
@@ -85,7 +82,6 @@ fun CarritoListScreenBody(
 @Composable
 fun CartItemCard(
     uiState: carritoUistate,
-    calcularTotal: () -> Unit,
     item: ItemEntity,
     onRemoveItem: (ItemEntity) -> Unit,
     deleteAllowed: Boolean
@@ -135,7 +131,6 @@ fun CartItemCard(
                             IconButton(
                                 onClick = {
                                     onRemoveItem(item)
-                                    calcularTotal()
                                 },
                                 modifier = Modifier.padding(1.dp)
                             ) {
