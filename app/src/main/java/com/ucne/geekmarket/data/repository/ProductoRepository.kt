@@ -17,9 +17,8 @@ class ProductoRepository @Inject constructor(
 
     suspend fun getProductosItem(id: Int)= productoDao.getProductoItem(id)
 
-    //TODO: Ver si puedo hacer que se carguen los productos de la api desde esta funcion
     fun getProductoByCategoria(categoria: String) = productoDao.getProductoByCategoria(categoria)
-
+    suspend fun getSuspendCategoria(categoria: String) = productoDao.getSuspendByCategoria(categoria)
     suspend fun getApiToDb(){
         try {
             val productos = productoApi.getProductos()

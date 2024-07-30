@@ -26,7 +26,7 @@ interface CarritoDao {
     suspend fun find(id: Int): CarritoEntity?
 
     @Query("SELECT * FROM carritos ORDER BY carritoId DESC LIMIT 1")
-    suspend fun getLastRecord(): CarritoEntity?
+    suspend fun getLastCarrito(): CarritoEntity?
 
     @Query("SELECT * FROM carritos")
     fun getAll(): Flow<List<CarritoEntity>>

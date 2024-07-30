@@ -27,13 +27,11 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,7 +44,6 @@ import coil.compose.AsyncImage
 import com.ucne.geekmarket.data.local.entities.ItemEntity
 import com.ucne.geekmarket.data.local.entities.ProductoEntity
 import com.ucne.geekmarket.data.local.entities.PromocionEntity
-import com.ucne.geekmarket.data.remote.dto.PromocionDto
 import com.ucne.geekmarket.presentation.Common.formatNumber
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -56,9 +53,10 @@ fun ProductoListScreen(
     viewModel: ProductoViewModel = hiltViewModel(),
     onVerProducto: (ProductoEntity) -> Unit,
     innerPadding: PaddingValues,
-    goToProduct: (PromocionEntity) -> Unit
+    goToPromotion: (PromocionEntity) -> Unit,
+    goToCategoria: (String) -> Unit
 ) {
-    val promciones = viewModel.promociones.collectAsStateWithLifecycle()
+    val promociones = viewModel.promociones.collectAsStateWithLifecycle()
     val laptops = viewModel.laptops.collectAsStateWithLifecycle()
     val laptopsGaming = viewModel.laptopsGaming.collectAsStateWithLifecycle()
     val desktops = viewModel.descktops.collectAsStateWithLifecycle()
@@ -69,10 +67,12 @@ fun ProductoListScreen(
         laptopsGaming = laptopsGaming.value,
         desktops = desktops.value,
         onVerProducto = onVerProducto,
+
         innerPadding = innerPadding,
         onAddItem = viewModel::onAddItem,
         uiState = uiState,
-        goToProduct = goToProduct
+        goToPromotion = goToPromotion,
+        goToCategoria = goToCategoria
     )
 }
 
@@ -84,33 +84,31 @@ fun ProductoListBody(
     laptopsGaming: List<ProductoEntity>,
     onVerProducto: (ProductoEntity) -> Unit,
     innerPadding: PaddingValues,
-    goToProduct: (PromocionEntity) -> Unit,
+    goToPromotion: (PromocionEntity) -> Unit,
     onAddItem: (ItemEntity) -> Unit,
+    goToCategoria: (String) -> Unit
 ) {
-
-    var cantidad by remember { mutableStateOf(1) }
-
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(innerPadding)
-            .padding(10.dp),
+            .padding(start = 10.dp, end = 10.dp, bottom = 1.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item{
-            PromotionCard(uiState, goToProduct)
-
+            PromotionCard(uiState, goToPromotion)
         }
         item {
             Column {
-
-                Text(
-                    text = "Laptops",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .padding(4.dp)
-                )
+                TextButton(onClick = { goToCategoria("Laptop") }) {
+                    Text(
+                        text = "Laptops",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .padding(4.dp)
+                    )
+                }
                 if (laptops.isEmpty()) {
                     Column(
                         modifier = Modifier
@@ -150,14 +148,15 @@ fun ProductoListBody(
         }
         item {
             Column {
-
-                Text(
-                    text = "Laptops Gaming",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .padding(4.dp)
-                )
+                TextButton(onClick = { goToCategoria("Laptop-Gaming") }) {
+                    Text(
+                        text = "Laptops Gaming",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .padding(4.dp)
+                    )
+                }
                 if (laptopsGaming.isEmpty()) {
                     Column(
                         modifier = Modifier
@@ -194,14 +193,16 @@ fun ProductoListBody(
         }
         item {
             Column {
-                Text(
-                    text = "Desktops",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .align(Alignment.Start)
-                        .padding(4.dp)
-                )
+                TextButton(onClick = { goToCategoria("Desktop") }) {
+                    Text(
+                        text = "Desktops",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+//                            .align(Alignment.Start)
+                            .padding(4.dp)
+                    )
+                }
                 if (laptops.isEmpty()) {
                     Column(
                         modifier = Modifier
@@ -244,7 +245,7 @@ fun ProductCard(producto: ProductoEntity, onAddToCart: (ItemEntity) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(380.dp)
+            .height(360.dp)
             .padding(1.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
@@ -280,7 +281,9 @@ fun PromotionCard(uiState: ProductoUistate, goToProduct: (PromocionEntity) -> Un
     })
     val scope = rememberCoroutineScope()
     Card (
-        modifier = Modifier.fillMaxWidth().padding(1.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(1.dp)
     ){
 
         Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
@@ -306,7 +309,7 @@ fun PromotionCard(uiState: ProductoUistate, goToProduct: (PromocionEntity) -> Un
                             contentDescription = null,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable {goToProduct(uiState.promociones[page])}
+                                .clickable { goToProduct(uiState.promociones[page]) }
                                 .fillMaxHeight()
                                 .height(151.dp)
                         )

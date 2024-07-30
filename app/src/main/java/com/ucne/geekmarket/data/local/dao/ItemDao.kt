@@ -45,7 +45,14 @@ interface ItemDao {
     )
     suspend fun findItemByProducto(productoId: Int, carritoId: Int): ItemEntity?
 
-
+    @Query(
+        """
+            SELECT COUNT(*) AS item_count
+            FROM Items
+            WHERE carritoId = (SELECT MAX(carritoId) FROM Carritos WHERE pagado = 0)
+        """
+    )
+    suspend fun getItemsCount(): Int
     @Query(
         """
             SELECT EXISTS 

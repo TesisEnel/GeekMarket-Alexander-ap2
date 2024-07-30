@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.ucne.geekmarket.data.local.entities.ItemEntity
 import com.ucne.geekmarket.data.local.entities.ProductoEntity
 import com.ucne.geekmarket.data.local.entities.PromocionEntity
+import com.ucne.geekmarket.data.local.entities.WishEntity
 import com.ucne.geekmarket.data.remote.dto.ProductoDto
 import com.ucne.geekmarket.data.remote.dto.PromocionDto
 import com.ucne.geekmarket.data.repository.CarritoRepository
@@ -13,6 +14,7 @@ import com.ucne.geekmarket.data.repository.ItemRepository
 import com.ucne.geekmarket.data.repository.ProductoRepository
 import com.ucne.geekmarket.data.repository.PromcionRepository
 import com.ucne.geekmarket.data.repository.Resource
+import com.ucne.geekmarket.data.repository.WishListRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -95,6 +97,7 @@ class ProductoViewModel @Inject constructor(
             }
         }
     }
+
 
 }
 

@@ -73,4 +73,7 @@ object AppModule {
     @Provides
     fun privedePromocionDao(database: GeekMarketDb) = database.promocionDao()
 
+    @Provides
+    fun provideWishListDao(database: GeekMarketDb) = database.wishListDao()
+
 }

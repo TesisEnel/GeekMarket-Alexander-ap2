@@ -48,5 +48,13 @@ interface ProductoDao {
         """
     )
     fun getProductoByCategoria(categoria: String): Flow<List<ProductoEntity>>
+    @Query(
+        """
+            SELECT *
+            FROM Productos p
+            WHERE categoria = :categoria;
+        """
+    )
+    suspend fun getSuspendByCategoria(categoria: String): List<ProductoEntity>
 
 }

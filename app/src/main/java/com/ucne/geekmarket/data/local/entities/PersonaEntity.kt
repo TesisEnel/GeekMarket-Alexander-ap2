@@ -6,9 +6,9 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "Personas")
 data class PersonaEntity(
     @PrimaryKey
-    val personaId: Int,
-    val nombre: String,
-    val apellido: String,
-    val edad: Int,
-    val Correo: String
+    val personaId: Int?=null,
+    val nombre: String?=null,
+    val apellido: String?=null,
+    val edad: Int?=null,
+    val Correo: String?=null
 )
