@@ -57,4 +57,7 @@ interface ProductoDao {
     )
     suspend fun getSuspendByCategoria(categoria: String): List<ProductoEntity>
 
+    @Query("SELECT * FROM Productos WHERE nombre LIKE '%' || :query || '%'")
+    suspend fun searchProducto(query: String): List<ProductoEntity>
+
 }

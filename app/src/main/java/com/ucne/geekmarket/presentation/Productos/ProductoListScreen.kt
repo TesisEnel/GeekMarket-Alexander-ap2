@@ -2,6 +2,7 @@ package com.ucne.geekmarket.presentation.Productos
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,10 +23,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -36,11 +44,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.ucne.geekmarket.R
 import com.ucne.geekmarket.data.local.entities.ItemEntity
 import com.ucne.geekmarket.data.local.entities.ProductoEntity
 import com.ucne.geekmarket.data.local.entities.PromocionEntity
@@ -54,39 +65,45 @@ fun ProductoListScreen(
     onVerProducto: (ProductoEntity) -> Unit,
     innerPadding: PaddingValues,
     goToPromotion: (PromocionEntity) -> Unit,
-    goToCategoria: (String) -> Unit
+    goToCategoria: (String) -> Unit,
+    goToSearchScreen: () -> Unit
 ) {
     val promociones = viewModel.promociones.collectAsStateWithLifecycle()
     val laptops = viewModel.laptops.collectAsStateWithLifecycle()
     val laptopsGaming = viewModel.laptopsGaming.collectAsStateWithLifecycle()
     val desktops = viewModel.descktops.collectAsStateWithLifecycle()
+    val accesorios = viewModel.accesorios.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     ProductoListBody(
         laptops = laptops.value,
         laptopsGaming = laptopsGaming.value,
         desktops = desktops.value,
+        accesorios = accesorios.value,
         onVerProducto = onVerProducto,
-
         innerPadding = innerPadding,
         onAddItem = viewModel::onAddItem,
         uiState = uiState,
         goToPromotion = goToPromotion,
-        goToCategoria = goToCategoria
+        goToCategoria = goToCategoria,
+        goToSearchScreen = goToSearchScreen
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductoListBody(
     uiState: ProductoUistate,
     laptops: List<ProductoEntity>,
+    accesorios: List<ProductoEntity>,
     desktops: List<ProductoEntity>,
     laptopsGaming: List<ProductoEntity>,
     onVerProducto: (ProductoEntity) -> Unit,
     innerPadding: PaddingValues,
     goToPromotion: (PromocionEntity) -> Unit,
     onAddItem: (ItemEntity) -> Unit,
-    goToCategoria: (String) -> Unit
+    goToCategoria: (String) -> Unit,
+    goToSearchScreen: () -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -95,6 +112,43 @@ fun ProductoListBody(
             .padding(start = 10.dp, end = 10.dp, bottom = 1.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        item {
+            val context = LocalContext.current
+            val iconColor = if (isSystemInDarkTheme()) {
+                Color(ContextCompat.getColor(context, R.color.white)) // Color for dark theme
+            } else {
+                Color(ContextCompat.getColor(context, R.color.black))// Color for light theme
+            }
+
+            ExposedDropdownMenuBox(
+                expanded = false ,
+                onExpandedChange = {
+                    goToSearchScreen()
+                }
+            ) {
+//                OutlinedTextField(value = "", onValueChange = {})
+                OutlinedTextField(
+                    value = "Buscar",
+                    onValueChange = { },
+                    readOnly = true,
+                    placeholder = { Text(text = "Buscar") },
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth()
+                        .padding(vertical = 10.dp),
+//                        .clip(RoundedCornerShape(50)),
+                    shape = RoundedCornerShape(50),
+                    trailingIcon = {
+                       Icon(
+                           imageVector = Icons.Default.Search,
+                           contentDescription = null,
+                           tint = iconColor
+                       )
+                    }
+                )
+            }
+
+        }
         item{
             PromotionCard(uiState, goToPromotion)
         }
@@ -145,6 +199,52 @@ fun ProductoListBody(
 
                 }
             }
+        }
+        item {
+            Column {
+                TextButton(onClick = { goToCategoria("Accesorio") }) {
+                    Text(
+                        text = "Accesorios",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+//                            .align(Alignment.Start)
+                            .padding(4.dp)
+                    )
+                }
+                if (accesorios.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                } else {
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        items(accesorios) { item ->
+                            Row(modifier = Modifier
+                                .fillMaxWidth()
+                                .width(200.dp)
+                                .clickable {
+                                    onVerProducto(item)
+                                }
+                                .padding(3.dp),
+                                verticalAlignment = Alignment.CenterVertically) {
+
+                                ProductCard(
+                                    producto = item,
+                                    onAddToCart = onAddItem,
+                                )
+
+                            }
+                        }
+                    }
+                }
+            }
+
         }
         item {
             Column {

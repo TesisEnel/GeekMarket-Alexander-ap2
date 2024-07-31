@@ -92,43 +92,50 @@ fun CategoriaListBody(
 
     var cantidad by remember { mutableStateOf(1) }
 
-    LazyVerticalGrid(
-        modifier = Modifier
-            .padding(innerPadding)
-            .fillMaxHeight()
-            .fillMaxWidth()
-            .clip(shape = RoundedCornerShape(10.dp))
-            .padding(bottom = 1.dp,start = 10.dp, end = 10.dp),
-        columns = GridCells.Adaptive(minSize = 158.dp)
-    ) {
+    Column (modifier = Modifier.padding(innerPadding)){
+        Text(
+            text = uiState.categoria?: "",
+            style = MaterialTheme.typography.headlineLarge,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .padding( 10.dp)
+        )
+        LazyVerticalGrid(
+            modifier = Modifier
 
+                .fillMaxHeight()
+                .fillMaxWidth()
+                .clip(shape = RoundedCornerShape(10.dp))
+                .padding(bottom = 1.dp, start = 10.dp, end = 10.dp),
+            columns = GridCells.Adaptive(minSize = 158.dp)
+        ) {
+            items(uiState.productos?: emptyList()) { item ->
+                if (uiState.productos.isNullOrEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize(),
 
-        items(uiState.productos?: emptyList()) { item ->
-            if (uiState.productos.isNullOrEmpty()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
 
-                    horizontalAlignment = Alignment.CenterHorizontally,
-
-                    ) {
-                    CircularProgressIndicator()
-                }
-            }
-            else {
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .width(200.dp)
-                    .clickable {
-                        onVerProducto(item)
+                        ) {
+                        CircularProgressIndicator()
                     }
-                    .padding(3.dp),
-                    verticalAlignment = Alignment.CenterVertically) {
+                }
+                else {
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .width(200.dp)
+                        .clickable {
+                            onVerProducto(item)
+                        }
+                        .padding(3.dp),
+                        verticalAlignment = Alignment.CenterVertically) {
 
-                    ProductCard(
-                        producto = item,
-                        onAddToCart = onAddItem,
-                    )
+                        ProductCard(
+                            producto = item,
+                            onAddToCart = onAddItem,
+                        )
+                    }
                 }
             }
         }

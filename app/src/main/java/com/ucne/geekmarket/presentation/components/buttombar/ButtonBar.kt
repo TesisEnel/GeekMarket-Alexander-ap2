@@ -64,9 +64,9 @@ fun BottonBar(
     goToListaProducto: () -> Unit,
     goToCarrito: () -> Unit,
     goToWishList: () -> Unit,
-    currentRoute: String?
+    currentRoute: String?,
+    viewModel: ButtonBarViewModel = hiltViewModel()
 ) {
-    val viewModel: ButtonBarViewModel = hiltViewModel()
     val itemList by viewModel.items.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsState()
     val quantity = uiState.quantity
@@ -117,17 +117,13 @@ fun BottonBar(
                     hasNews = false,
                     direction = Screen.Profile.toString()
                 ),
-
-
-                )
+            )
             //TODO: Arreglar que cando les das a back se ponga el icono correcto
             var selectedeDirection by rememberSaveable {
                 mutableStateOf(currentRoute ?: Screen.ProductList.toString())
             }
 
             items.forEach { item ->
-
-
                 NavigationBarItem(
                     modifier = Modifier
                         .align(Alignment.Bottom)
@@ -150,7 +146,7 @@ fun BottonBar(
                         BadgedBox(
                             badge = {
                                 if (item.direction == Screen.CarritoList.toString() &&
-                                    (quantity?: 0) > 0
+                                    (quantity ?: 0) > 0
                                 ) {
                                     Badge {
                                         Text(text = (uiState.quantity).toString())

@@ -17,6 +17,7 @@ import androidx.navigation.toRoute
 import com.ucne.geekmarket.presentation.Carritos.CarritoListScreen
 import com.ucne.geekmarket.presentation.ProductoDetail.ProductDetailed
 import com.ucne.geekmarket.presentation.Productos.ProductoListScreen
+import com.ucne.geekmarket.presentation.Search.SearchScreen
 import com.ucne.geekmarket.presentation.categoria.CategoriaListScreen
 import com.ucne.geekmarket.presentation.components.buttombar.BottonBar
 import com.ucne.geekmarket.presentation.components.CustomTopAppBar
@@ -29,16 +30,17 @@ fun GeekMarketNavHost(
 ) {
     val navBackStackEntry by navHostController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    var isInCarrito by remember { mutableStateOf(false) }
     var showDeleteButton by remember { mutableStateOf(false) }
     //Mover el Scaffold a otro lugar TODO
-    Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
-        CustomTopAppBar(
-            lable = "GeekMarket",
-            topBarAction = { showDeleteButton = !showDeleteButton },
-            isInCarrito = isInCarrito
-        )
-    },
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            CustomTopAppBar(
+                lable = "GeekMarket",
+                topBarAction = { showDeleteButton = !showDeleteButton },
+                isInCarrito = currentRoute?.contains(Screen.CarritoList.toString())?: false,
+            )
+        },
         bottomBar = {
             BottonBar(
                 goToListaProducto = { navHostController.navigate(Screen.ProductList) },
@@ -72,9 +74,13 @@ fun GeekMarketNavHost(
                                 it
                             )
                         )
+                    },
+                    goToSearchScreen = {
+                        navHostController.navigate(
+                            Screen.Search
+                        )
                     }
                 )
-                isInCarrito = false
             }
             composable<Screen.ProductDetail> {
                 val args = it.toRoute<Screen.ProductDetail>().productoId
@@ -83,11 +89,9 @@ fun GeekMarketNavHost(
                     innerPadding = innerPadding,
                     productoId = args
                 )
-                isInCarrito = false
             }
             composable<Screen.CarritoList> {
-                isInCarrito = true
-                CarritoListScreen(innerPadding, showDeleteButton )
+                CarritoListScreen(innerPadding, showDeleteButton)
             }
             composable<Screen.Categoria> {
                 CategoriaListScreen(
@@ -111,6 +115,12 @@ fun GeekMarketNavHost(
             }
             composable<Screen.WishList> {
                 WishListScreen(innerPadding, true)
+            }
+            composable<Screen.Search> {
+                SearchScreen(
+                    goToHomeScreen = { navHostController.navigate(Screen.ProductList) },
+                    goToProducto = {navHostController.navigate(Screen.ProductDetail(it.productoId))}
+                )
             }
 
         }

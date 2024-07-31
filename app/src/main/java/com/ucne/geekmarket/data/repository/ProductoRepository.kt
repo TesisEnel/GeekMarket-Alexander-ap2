@@ -17,6 +17,14 @@ class ProductoRepository @Inject constructor(
 
     suspend fun getProductosItem(id: Int)= productoDao.getProductoItem(id)
 
+    suspend fun searchProducto(query: String) : List<ProductoEntity> {
+        if(query.isEmpty()){
+           return emptyList()
+        }
+        else{
+            return productoDao.searchProducto(query)
+        }
+    }
     fun getProductoByCategoria(categoria: String) = productoDao.getProductoByCategoria(categoria)
     suspend fun getSuspendCategoria(categoria: String) = productoDao.getSuspendByCategoria(categoria)
     suspend fun getApiToDb(){
@@ -27,59 +35,6 @@ class ProductoRepository @Inject constructor(
             }
         }catch (e: Exception){
             Log.e("Error", e.message.toString())
-        }
-    }
-
-    fun getProductos(): Flow<Resource<List<ProductoDto>>> = flow {
-
-        emit(Resource.Loading())
-        try{
-            val productos = productoApi.getProductos()
-            productos.forEach {
-                productoDao.save(it.toEntity())
-            }
-            emit(Resource.Success(productos))
-        }catch (e: Exception){
-            Log.e("Error", e.message.toString())
-            emit(Resource.Error(e.message ?: "An unexpected error occurred"))
-        }
-    }
-    fun getProductos(categoria: String): Flow<Resource<List<ProductoDto>>> = flow {
-
-        emit(Resource.Loading())
-        try{
-            val tickets = productoApi.getProductos(categoria)
-            emit(Resource.Success(tickets))
-        }catch (e: Exception){
-            Log.e("Error", e.message.toString())
-            emit(Resource.Error(e.message ?: "An unexpected error occurred"))
-        }
-    }
-    suspend fun saveProducto(producto: ProductoDto){
-        try {
-            productoApi.saveProducto(producto)
-        }
-
-        catch (e: Exception){
-
-        }
-    }
-    suspend fun updateProducto(producto: ProductoDto){
-        try {
-            productoApi.updateProducto(producto.productoId, producto)
-        }
-
-        catch (e: Exception){
-
-        }
-    }
-    suspend fun deleteProducto(producto: ProductoDto){
-        try {
-            productoApi.deleteProducto(producto.productoId)
-        }
-
-        catch (e: Exception){
-
         }
     }
     suspend fun getProducto(id: Int) = productoDao.find(id)

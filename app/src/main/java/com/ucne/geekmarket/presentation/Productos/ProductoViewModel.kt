@@ -70,8 +70,14 @@ class ProductoViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = emptyList()
         )
-
-    fun onAddItem(item: ItemEntity) {
+    val accesorios = productoRepository.getProductoByCategoria("Accesorio")
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+        )
+    fun onAddItem(item: ItemEntity)
+    {
         viewModelScope.launch {
             itemRepository.AddItem(item)
         }

@@ -13,6 +13,8 @@ sealed class Screen {
     data object WishList : Screen()
     @Serializable
     data object Profile : Screen()
+    @Serializable
+    data object Search : Screen()
 
     @Serializable
     data class Categoria(val categoria: String) : Screen()

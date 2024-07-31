@@ -40,7 +40,7 @@ fun WishListScreen(
     deleteAllowed: Boolean,
     viewModel: WishListViewModel = hiltViewModel(),
 ) {
-
+    
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     CarritoListScreenBody(
