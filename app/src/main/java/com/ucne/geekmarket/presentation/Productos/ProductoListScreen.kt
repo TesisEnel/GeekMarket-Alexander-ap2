@@ -121,7 +121,7 @@ fun ProductoListBody(
             }
 
             ExposedDropdownMenuBox(
-                expanded = false ,
+                expanded = false,
                 onExpandedChange = {
                     goToSearchScreen()
                 }
@@ -139,17 +139,17 @@ fun ProductoListBody(
 //                        .clip(RoundedCornerShape(50)),
                     shape = RoundedCornerShape(50),
                     trailingIcon = {
-                       Icon(
-                           imageVector = Icons.Default.Search,
-                           contentDescription = null,
-                           tint = iconColor
-                       )
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = null,
+                            tint = iconColor
+                        )
                     }
                 )
             }
 
         }
-        item{
+        item {
             PromotionCard(uiState, goToPromotion)
         }
         item {
@@ -208,7 +208,6 @@ fun ProductoListBody(
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
-//                            .align(Alignment.Start)
                             .padding(4.dp)
                     )
                 }
@@ -299,7 +298,6 @@ fun ProductoListBody(
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
-//                            .align(Alignment.Start)
                             .padding(4.dp)
                     )
                 }
@@ -380,18 +378,18 @@ fun PromotionCard(uiState: ProductoUistate, goToProduct: (PromocionEntity) -> Un
         4
     })
     val scope = rememberCoroutineScope()
-    Card (
+    Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(1.dp)
-    ){
+    ) {
 
         Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
             LaunchedEffect(key1 = pagerState) {
                 while (true) {
                     delay(3000)
                     var nextPage = 0
-                    if(pagerState.currentPage < 3) {
+                    if (pagerState.currentPage < 3) {
                         nextPage = (pagerState.currentPage + 1)
                     }
                     scope.launch {
@@ -399,7 +397,8 @@ fun PromotionCard(uiState: ProductoUistate, goToProduct: (PromocionEntity) -> Un
                     }
                 }
             }
-            HorizontalPager(state = pagerState,
+            HorizontalPager(
+                state = pagerState,
                 modifier = Modifier.fillMaxSize()
             ) { page ->
                 if (uiState.promociones.isNotEmpty()) {
@@ -426,7 +425,8 @@ fun PromotionCard(uiState: ProductoUistate, goToProduct: (PromocionEntity) -> Un
                 verticalAlignment = Alignment.Bottom
             ) {
                 repeat(pagerState.pageCount) { iteration ->
-                    val color = if (pagerState.currentPage == iteration) Color.DarkGray else Color.LightGray
+                    val color =
+                        if (pagerState.currentPage == iteration) Color.DarkGray else Color.LightGray
                     Box(
                         modifier = Modifier
                             .padding(2.dp)

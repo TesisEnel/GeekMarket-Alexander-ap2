@@ -18,11 +18,8 @@ class WishListViewModel @Inject constructor(
     private val wishListRepository: WishListRepository,
 ) : ViewModel() {
 
-
-
     private val _uiState = MutableStateFlow(wishListUistate())
     val uiState = _uiState.asStateFlow()
-
 
     init {
         getWishList()
@@ -73,7 +70,6 @@ data class wishListUistate(
     val productos: List<ProductoEntity>? = null,
     val errorMessage: String? = null
 )
-
 
 fun wishListUistate.toEntity() = WishEntity(
     wishId = wishId ?: 0,

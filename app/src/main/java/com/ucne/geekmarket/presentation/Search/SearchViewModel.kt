@@ -31,8 +31,6 @@ class SearchViewModel @Inject constructor(
     private val _uiState = MutableStateFlow((SearchUistate()))
     val uiState = _uiState.asStateFlow()
 
-
-
     fun search(query: String) {
         viewModelScope.launch {
             var producto by mutableStateOf(emptyList<ProductoEntity>())
@@ -42,16 +40,8 @@ class SearchViewModel @Inject constructor(
                     productos = producto
                 )
             }
-
         }
     }
-
-    fun getProductos() {
-        viewModelScope.launch {
-            productoRepository.getApiToDb()
-        }
-    }
-
 
 }
 

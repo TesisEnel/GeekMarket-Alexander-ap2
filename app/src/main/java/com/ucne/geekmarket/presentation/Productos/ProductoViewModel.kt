@@ -70,12 +70,14 @@ class ProductoViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = emptyList()
         )
+
     val accesorios = productoRepository.getProductoByCategoria("Accesorio")
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = emptyList()
         )
+
     fun onAddItem(item: ItemEntity)
     {
         viewModelScope.launch {
@@ -93,6 +95,7 @@ class ProductoViewModel @Inject constructor(
             productoRepository.getApiToDb()
         }
     }
+
     fun getPromociones() {
         viewModelScope.launch {
             promocionRepository.getApiToDb()
@@ -103,37 +106,14 @@ class ProductoViewModel @Inject constructor(
             }
         }
     }
-
-
 }
 
 
 data class ProductoUistate(
-    val productoId: Int? = null,
-    val nombre: String= "",
-    val precio: Double? = null,
-    val descripcion: String? = null,
-    val stock: Int? = 0,
-    val categoria: String? = null,
-    val imagen: String? = null,
-    val especificacion: String? = null,
-    val isLoading: Boolean = false,
-    val producto: ProductoDto? = null,
     val laptops: List<ProductoEntity> = emptyList(),
     val descktops: List<ProductoEntity> = emptyList(),
     val productos: List<ProductoDto> = emptyList(),
     val laptopsGaming: List<ProductoEntity> = emptyList(),
     val promociones: List<PromocionEntity> = emptyList(),
     val errorMessage: String? = null
-)
-
-fun ProductoUistate.toDTO() = ProductoDto(
-    productoId = productoId?: 0,
-    nombre = nombre,
-    precio = precio?: 0.0,
-    descripcion = descripcion?: "",
-    categoria = categoria?: "",
-    imagen = imagen?: "",
-    stocks = stock?: 0,
-    especificacion = especificacion?: "",
 )

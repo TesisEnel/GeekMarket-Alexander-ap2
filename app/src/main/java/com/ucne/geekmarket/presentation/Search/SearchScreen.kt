@@ -98,7 +98,7 @@ fun ProductoCard(producto: ProductoEntity, goToProducto: (ProductoEntity) -> Uni
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(360.dp)
+            .height(270.dp)
             .clickable {
                 goToProducto(producto)
             }
@@ -123,9 +123,6 @@ fun ProductoCard(producto: ProductoEntity, goToProducto: (ProductoEntity) -> Uni
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Descripción: ${producto.especificacion}", maxLines = 3)
-            Text(text = "Precio: ${formatNumber(producto.precio)}")
         }
     }
 }
