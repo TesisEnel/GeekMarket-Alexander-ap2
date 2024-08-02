@@ -5,7 +5,6 @@ import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
 import com.ucne.geekmarket.data.local.entities.CarritoEntity
-import com.ucne.geekmarket.data.local.entities.ProductoEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -15,7 +14,6 @@ interface CarritoDao {
 
     @Delete
     suspend fun delete(carrito: CarritoEntity)
-
 
     @Query(
         """
@@ -28,7 +26,7 @@ interface CarritoDao {
     suspend fun find(id: Int): CarritoEntity?
 
     @Query("SELECT * FROM carritos ORDER BY carritoId DESC LIMIT 1")
-    suspend fun getLastRecord(): CarritoEntity?
+    suspend fun getLastCarrito(): CarritoEntity?
 
     @Query("SELECT * FROM carritos")
     fun getAll(): Flow<List<CarritoEntity>>

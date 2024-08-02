@@ -107,6 +107,24 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
+    //Material
+    implementation("androidx.compose.foundation:foundation:1.1.1")
+
+    // Pager
+    implementation (libs.accompanist.pager)
+    implementation (libs.accompanist.pager.indicators)
+
+    //Icons
+    implementation ("io.coil-kt:coil-compose:2.0.0")
+
+    //foundation
+    implementation ("androidx.compose.foundation:foundation:1.4.0-alpha05")
+    implementation("androidx.compose.foundation:foundation:1.0.5")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5")
+
+
 
 
     testImplementation(libs.junit)

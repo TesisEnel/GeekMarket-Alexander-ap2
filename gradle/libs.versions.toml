@@ -1,4 +1,7 @@
 [versions]
+accompanistPager = "0.28.0"
+accompanistPagerIndicatorsVersion = "<version>"
+accompanistPagerVersion = "<version>"
 agp = "8.4.0-rc02"
 hiltAndroid = "2.51"
 kotlin = "1.9.24"
@@ -18,6 +21,8 @@ lifecycleViewmodelCompose = "2.7.0"
 kotlinSerialization = "1.9.24"
 
 [libraries]
+accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanistPager" }
+accompanist-pager-indicators = { module = "com.google.accompanist:accompanist-pager-indicators", version.ref = "accompanistPager" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }

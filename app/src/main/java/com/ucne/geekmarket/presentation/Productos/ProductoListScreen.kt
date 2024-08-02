@@ -1,112 +1,158 @@
 package com.ucne.geekmarket.presentation.Productos
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.ucne.geekmarket.data.local.entities.Items
-import com.ucne.geekmarket.data.remote.dto.ProductoDto
-import com.ucne.geekmarket.presentation.Carritos.CarritoViewModel
-import com.ucne.geekmarket.presentation.Carritos.carritoUistate
-
+import com.ucne.geekmarket.R
+import com.ucne.geekmarket.data.local.entities.ItemEntity
+import com.ucne.geekmarket.data.local.entities.ProductoEntity
+import com.ucne.geekmarket.data.local.entities.PromocionEntity
+import com.ucne.geekmarket.presentation.Common.formatNumber
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun ProductoListScreen(
     viewModel: ProductoViewModel = hiltViewModel(),
-    viewModelCarrito: CarritoViewModel = hiltViewModel(),
-    onVerProducto: (ProductoDto) -> Unit,
+    onVerProducto: (ProductoEntity) -> Unit,
     innerPadding: PaddingValues,
-
-    ) {
-//    LaunchedEffect(Unit) {
-//        viewModelCarrito.getLastCarrito()
-//    }
+    goToPromotion: (PromocionEntity) -> Unit,
+    goToCategoria: (String) -> Unit,
+    goToSearchScreen: () -> Unit
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val uiStateCarrito by viewModelCarrito.uiState.collectAsStateWithLifecycle()
-    LaunchedEffect(Unit) {
-        viewModel.getProductosByCategoria()
-        viewModelCarrito.getLastCarrito()
-    }
+
     ProductoListBody(
-        laptops = uiState.laptops,
-        laptopsGaming = uiState.laptopsGaming,
-        desktops = uiState.descktops,
         onVerProducto = onVerProducto,
         innerPadding = innerPadding,
-        onAddItem = viewModelCarrito::onAddItem,
-        uiStateCarrito = uiStateCarrito,
+        onAddItem = viewModel::onAddItem,
+        uiState = uiState,
+        goToPromotion = goToPromotion,
+        goToCategoria = goToCategoria,
+        goToSearchScreen = goToSearchScreen
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductoListBody(
-    laptops: List<ProductoDto>,
-    desktops: List<ProductoDto>,
-    laptopsGaming: List<ProductoDto>,
-    onVerProducto: (ProductoDto) -> Unit,
+    uiState: ProductoUistate,
+//    accesorios: List<ProductoEntity>,
+//    laptops: List<ProductoEntity>,
+//    desktops: List<ProductoEntity>,
+//    laptopsGaming: List<ProductoEntity>,
+    onVerProducto: (ProductoEntity) -> Unit,
     innerPadding: PaddingValues,
-    uiStateCarrito: carritoUistate,
-    onAddItem: (Items) -> Unit,
+    goToPromotion: (PromocionEntity) -> Unit,
+    onAddItem: (ItemEntity) -> Unit,
+    goToCategoria: (String) -> Unit,
+    goToSearchScreen: () -> Unit
 ) {
-
-    var cantidad by remember { mutableStateOf(0) }
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(innerPadding)
-            .padding(10.dp),
+            .padding(start = 10.dp, end = 10.dp, bottom = 1.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
-            Column {
+            val context = LocalContext.current
+            val iconColor = if (isSystemInDarkTheme()) {
+                Color(ContextCompat.getColor(context, R.color.white))
+            } else {
+                Color(ContextCompat.getColor(context, R.color.black))
+            }
 
-                Text(
-                    text = "Laptops",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
+            ExposedDropdownMenuBox(
+                expanded = false,
+                onExpandedChange = {
+                    goToSearchScreen()
+                }
+            ) {
+                OutlinedTextField(
+                    value = "Buscar",
+                    onValueChange = { },
+                    readOnly = true,
+                    placeholder = { Text(text = "Buscar") },
                     modifier = Modifier
-                        .padding(4.dp)
+                        .menuAnchor()
+                        .fillMaxWidth()
+                        .padding(vertical = 10.dp),
+                    shape = RoundedCornerShape(50),
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = null,
+                            tint = iconColor
+                        )
+                    }
                 )
-                if (laptops.isEmpty()) {
+            }
+
+        }
+        item {
+            PromotionCard(uiState, goToPromotion)
+        }
+        item {
+            Column {
+                TextButton(onClick = { goToCategoria("Laptop") }) {
+                    Text(
+                        text = "Laptops",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .padding(4.dp)
+                    )
+                }
+                if (uiState.laptops.isEmpty()) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize(),
@@ -120,7 +166,7 @@ fun ProductoListBody(
                     LazyRow(
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        items(laptops) { item ->
+                        items(uiState.laptops) { item ->
                             Row(modifier = Modifier
                                 .fillMaxWidth()
                                 .width(200.dp)
@@ -131,9 +177,9 @@ fun ProductoListBody(
                                 verticalAlignment = Alignment.CenterVertically) {
 
                                 ProductCard(
-                                    product = item,
+                                    producto = item,
                                     onAddToCart = onAddItem,
-                                    )
+                                )
 
 
                             }
@@ -145,15 +191,61 @@ fun ProductoListBody(
         }
         item {
             Column {
+                TextButton(onClick = { goToCategoria("Accesorio") }) {
+                    Text(
+                        text = "Accesorios",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .padding(4.dp)
+                    )
+                }
+                if (uiState.accesorios.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                } else {
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        items(uiState.accesorios) { item ->
+                            Row(modifier = Modifier
+                                .fillMaxWidth()
+                                .width(200.dp)
+                                .clickable {
+                                    onVerProducto(item)
+                                }
+                                .padding(3.dp),
+                                verticalAlignment = Alignment.CenterVertically) {
 
-                Text(
-                    text = "Laptops Gaming",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .padding(4.dp)
-                )
-                if (laptopsGaming.isEmpty()) {
+                                ProductCard(
+                                    producto = item,
+                                    onAddToCart = onAddItem,
+                                )
+
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+        item {
+            Column {
+                TextButton(onClick = { goToCategoria("Laptop-Gaming") }) {
+                    Text(
+                        text = "Laptops Gaming",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .padding(4.dp)
+                    )
+                }
+                if (uiState.laptopsGaming.isEmpty()) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize(),
@@ -166,7 +258,7 @@ fun ProductoListBody(
                     LazyRow(
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        items(laptopsGaming) { item ->
+                        items(uiState.laptopsGaming) { item ->
                             Row(modifier = Modifier
                                 .fillMaxWidth()
                                 .width(200.dp)
@@ -177,9 +269,9 @@ fun ProductoListBody(
                                 verticalAlignment = Alignment.CenterVertically) {
 
                                 ProductCard(
-                                    product = item,
+                                    producto = item,
                                     onAddToCart = onAddItem,
-                                    )
+                                )
 
                             }
                         }
@@ -189,15 +281,16 @@ fun ProductoListBody(
         }
         item {
             Column {
-                Text(
-                    text = "Desktops",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .align(Alignment.Start)
-                        .padding(4.dp)
-                )
-                if (laptops.isEmpty()) {
+                TextButton(onClick = { goToCategoria("Desktop") }) {
+                    Text(
+                        text = "Desktops",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .padding(4.dp)
+                    )
+                }
+                if (uiState.desktops.isEmpty()) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize(),
@@ -209,7 +302,7 @@ fun ProductoListBody(
                     LazyRow(
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        items(desktops) { item ->
+                        items(uiState.desktops) { item ->
                             Row(modifier = Modifier
                                 .fillMaxWidth()
                                 .width(200.dp)
@@ -220,7 +313,7 @@ fun ProductoListBody(
                                 verticalAlignment = Alignment.CenterVertically) {
 
                                 ProductCard(
-                                    product = item,
+                                    producto = item,
                                     onAddToCart = onAddItem,
                                 )
 
@@ -235,33 +328,21 @@ fun ProductoListBody(
 }
 
 @Composable
-fun ProductCard(product: ProductoDto, onAddToCart: (Items) -> Unit) {
+fun ProductCard(producto: ProductoEntity, onAddToCart: (ItemEntity) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(410.dp)
+            .height(360.dp)
             .padding(1.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
-        var cantidad by remember { mutableStateOf(0) }
-        IconButton(
-            onClick = { onAddToCart(Items(0, product, cantidad)) },
-            modifier = Modifier
-                .align(Alignment.End)
-                .size(30.dp)
-        )
-        {
-            Icon(imageVector = Icons.Default.AddCircle, contentDescription = "Agregar al carrito")
-        }
-
-
         Column(
             modifier = Modifier
                 .padding(16.dp)
         ) {
             AsyncImage(
-                model = product.imagen,
-                contentDescription = product.nombre,
+                model = producto.imagen,
+                contentDescription = producto.nombre,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp)
@@ -269,89 +350,85 @@ fun ProductCard(product: ProductoDto, onAddToCart: (Items) -> Unit) {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = product.nombre,
+                text = producto.nombre,
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Row {
-                IconButton(onClick = { cantidad-- }, enabled = cantidad > 0) {
-                    Icon(
-                        imageVector = Icons.Default.Remove,
-                        contentDescription = "Decrease Quantity"
-                    )
-                }
-                Text(text = "$cantidad")
-                IconButton(onClick = { cantidad++ }) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "Increase Quantity")
-                }
-            }
-            Text(text = "Descripción: ${product.especificacion}", maxLines = 4)
-            Text(text = "Precio: ${product.precio}")
+            Text(text = "Descripción: ${producto.especificacion}", maxLines = 3)
+            Text(text = "Precio: ${formatNumber(producto.precio)}")
         }
     }
 }
 
-//
-//@Composable
-//fun CartItemCard(
-//    item: Items,
-//    onIncreaseQuantity: () -> Unit,
-//    onDecreaseQuantity: () -> Unit,
-//    onRemoveItem: (Int) -> Unit
-//) {
-//    Card(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .padding(8.dp),
-//        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-//    ) {
-//        Row(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(16.dp),
-//            verticalAlignment = Alignment.CenterVertically
-//        ) {
-//            // Product Image (If available)
-//            item.producto?.imagen?.let { imageUrl ->
-//                AsyncImage(
-//                    model = imageUrl,
-//                    contentDescription = item.producto?.nombre ?: "",
-//                    modifier = Modifier
-//                        .size(80.dp)
-//                        .clip(RoundedCornerShape(8.dp))
-//                )
-//                Spacer(modifier = Modifier.width(16.dp))
-//            }
-//
-//            // Product DetailsColumn(modifier = Modifier.weight(1f)) {
-//            Text(
-//                text = item.producto?.nombre ?: "",
-//                style = MaterialTheme.typography.titleMedium,
-//                fontWeight = FontWeight.Bold
-//            )
-//            Spacer(modifier = Modifier.height(4.dp))
-//            Text(
-//                text = "Price: $${item.producto?.precio ?: 0}",
-//                style = MaterialTheme.typography.bodyMedium,
-//
-//                )
-//        }
-//
-//        // Quantity Controls
-//        Column {
-//            IconButton(onClick = onIncreaseQuantity) {
-//                Icon(imageVector = Icons.Default.Add, contentDescription = "Increase Quantity")
-//            }
-//            Text(text = "Qty: ${item.cantidad ?: 0}")
-//            IconButton(onClick = onDecreaseQuantity, enabled = (item.cantidad ?: 0) > 0) {
-//                Icon(imageVector = Icons.Default.Remove, contentDescription = "Decrease Quantity")
-//            }
-//        }
-//
-//        // Remove Item Button
-//        IconButton(onClick = onRemoveItem) {
-//            Icon(imageVector = Icons.Default.Delete, contentDescription = "Remove Item")
-//        }
-//    }
-//}
+@Composable
+fun PromotionCard(uiState: ProductoUistate, goToProduct: (PromocionEntity) -> Unit) {
+
+    val pagerState = rememberPagerState(pageCount = {
+        uiState.promociones?.size ?: 0
+    })
+    val scope = rememberCoroutineScope()
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(1.dp)
+    ) {
+
+        Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
+            LaunchedEffect(key1 = pagerState) {
+                while (true) {
+                    delay(3000)
+                    var nextPage = 0
+                    if (pagerState.currentPage < 3) {
+                        nextPage = (pagerState.currentPage + 1)
+                    }
+                    scope.launch {
+                        pagerState.animateScrollToPage(nextPage)
+                    }
+                }
+            }
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize()
+            ) { page ->
+                if (uiState.promociones.isNullOrEmpty()) {
+                    CircularProgressIndicator()
+                } else {
+                    AsyncImage(
+                        model = uiState.promociones!![page].imagen,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { goToProduct(uiState.promociones!![page]) }
+                            .fillMaxHeight()
+                            .height(151.dp)
+                    )
+                }
+
+            }
+            Row(
+                Modifier
+                    .wrapContentHeight()
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 8.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                repeat(pagerState.pageCount) { iteration ->
+                    val color =
+                        if (pagerState.currentPage == iteration) Color.DarkGray else Color.LightGray
+                    Box(
+                        modifier = Modifier
+                            .padding(2.dp)
+                            .clip(CircleShape)
+                            .background(color)
+                            .size(12.dp)
+                    )
+                }
+            }
+
+        }
+
+    }
+}

@@ -24,31 +24,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             GeekMarketTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Column(modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)) {
-                        val navHost = rememberNavController()
-                        GeekMarketNavHost(navHost)
-                    }
-                }
+                val navHost = rememberNavController()
+                GeekMarketNavHost(navHost)
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    GeekMarketTheme {
-        Greeting("Android")
     }
 }

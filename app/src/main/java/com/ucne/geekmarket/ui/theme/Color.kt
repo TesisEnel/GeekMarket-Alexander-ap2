@@ -17,6 +17,7 @@ val Pink40 = Color(0xFF7D5260)
 
 
 //custom color
+val GrayBackground = Color(0xFFF2F3F2)
 val ComponentColor1 = Color(0xffDBD4FE)
 val ComponentColor2 = Color(0xffE5F19D)
 val ComponentColor3=Color(0xffDFFEF8)

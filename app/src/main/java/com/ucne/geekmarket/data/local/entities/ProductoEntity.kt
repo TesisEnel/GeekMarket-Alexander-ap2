@@ -12,5 +12,6 @@ class ProductoEntity (
     val descripcion: String,
     val stock: Int,
     val categoria: String,
+    val especificacion: String,
     val imagen: String,
 )
