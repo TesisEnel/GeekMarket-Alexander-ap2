@@ -1,9 +1,11 @@
 package com.ucne.geekmarket.presentation.Carritos
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -14,6 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -42,14 +45,12 @@ fun CarritoListScreen(
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val items by viewModel.items.collectAsStateWithLifecycle()
 
     CarritoListScreenBody(
         uiState = uiState,
-        items = items,
         innerPadding = innerPadding,
         onRemoveItem = viewModel::deleteItem,
-        deleteAllowed = deleteAllowed
+        deleteAllowed = deleteAllowed,
     )
 }
 
@@ -58,22 +59,36 @@ fun CarritoListScreenBody(
     uiState: carritoUistate,
     innerPadding: PaddingValues,
     onRemoveItem: (ItemEntity) -> Unit,
-    items: List<ItemEntity>,
     deleteAllowed: Boolean
 ) {
-
-    LazyColumn(modifier = Modifier.padding(innerPadding)) {
-        items(uiState.items ?: emptyList()) { item ->
-            CartItemCard(
-                uiState = uiState,
-                item = item,
-                onRemoveItem = onRemoveItem,
-                deleteAllowed = deleteAllowed
-            )
+    Box(
+        modifier = Modifier
+            .padding(innerPadding)
+            .fillMaxWidth()
+            .fillMaxHeight()
+    ) {
+        LazyColumn(modifier = Modifier) {
+            items(uiState.items ?: emptyList()) { item ->
+                CartItemCard(
+                    uiState = uiState,
+                    item = item,
+                    onRemoveItem = onRemoveItem,
+                    deleteAllowed = deleteAllowed
+                )
+            }
+            item {
+                val total = uiState.total
+                CenteredTextDivider(text = "Total: $${formatNumber(total)} ")
+            }
         }
-        item {
-            val total = uiState.total
-            CenteredTextDivider(text = "Total: $${formatNumber(total)} ")
+        Button(
+            onClick = { },
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .padding(horizontal = 5.dp)
+        ) {
+            Text("Realizar compra")
         }
     }
 
@@ -127,7 +142,7 @@ fun CartItemCard(
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.padding(start = 8.dp)
                         )
-                        if(deleteAllowed){
+                        if (deleteAllowed) {
                             IconButton(
                                 onClick = {
                                     onRemoveItem(item)
@@ -142,7 +157,7 @@ fun CartItemCard(
                         }
                     }
                     Text(
-                        text = "Monto: ${formatNumber( item.monto)}",
+                        text = "Monto: ${formatNumber(item.monto)}",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }

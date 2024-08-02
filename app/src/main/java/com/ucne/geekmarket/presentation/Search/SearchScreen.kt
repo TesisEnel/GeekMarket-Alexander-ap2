@@ -88,7 +88,6 @@ fun SearchScreen(
             items(searchUiState.productos) { producto ->
                 ProductoCard(producto = producto, goToProducto = goToProducto)
             }
-//            when (searchResult.loadState.refresh)
         }
     }
 }

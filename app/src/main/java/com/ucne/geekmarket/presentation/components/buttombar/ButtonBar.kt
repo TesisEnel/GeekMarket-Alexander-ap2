@@ -76,6 +76,7 @@ fun BottonBar(
         NavigationBar(
             modifier = Modifier
                 .height(80.dp)
+                .padding(bottom = 10.dp)
                 .clip(
                     RoundedCornerShape(
                         topStart = 10.dp,

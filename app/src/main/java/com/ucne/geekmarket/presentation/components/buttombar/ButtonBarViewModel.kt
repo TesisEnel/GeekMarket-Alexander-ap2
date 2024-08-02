@@ -30,18 +30,14 @@ class ButtonBarViewModel @Inject constructor(
         )
 
 
-    init {
-//        getPromociones()
-    }
-
-
     fun getPromociones() {
         viewModelScope.launch {
-
-            _uiState.update {
-                it.copy(
-                    quantity = itemRepository.getItemsCount()
-                )
+            itemRepository.getItemsCount().collect { quantity ->
+                _uiState.update {
+                    it.copy(
+                        quantity = quantity
+                    )
+                }
             }
         }
     }

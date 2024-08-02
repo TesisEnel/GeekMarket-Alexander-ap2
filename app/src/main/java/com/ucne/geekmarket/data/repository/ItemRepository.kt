@@ -64,5 +64,5 @@ class ItemRepository @Inject constructor(
 
     fun getItem() = itemDao.getAll()
 
-    suspend fun getItemsCount () = itemDao.getItemsCount()
+    fun getItemsCount () = itemDao.getItemsCount()
 }

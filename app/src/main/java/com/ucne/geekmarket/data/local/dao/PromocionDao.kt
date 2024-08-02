@@ -24,7 +24,6 @@ interface PromocionDao {
             LIMIT 1
         """
     )
-
     suspend fun find(id: Int): PromocionEntity?
 
     @Query("SELECT * FROM Promociones")

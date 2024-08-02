@@ -68,18 +68,9 @@ fun ProductoListScreen(
     goToCategoria: (String) -> Unit,
     goToSearchScreen: () -> Unit
 ) {
-    val promociones = viewModel.promociones.collectAsStateWithLifecycle()
-    val laptops = viewModel.laptops.collectAsStateWithLifecycle()
-    val laptopsGaming = viewModel.laptopsGaming.collectAsStateWithLifecycle()
-    val desktops = viewModel.descktops.collectAsStateWithLifecycle()
-    val accesorios = viewModel.accesorios.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     ProductoListBody(
-        laptops = laptops.value,
-        laptopsGaming = laptopsGaming.value,
-        desktops = desktops.value,
-        accesorios = accesorios.value,
         onVerProducto = onVerProducto,
         innerPadding = innerPadding,
         onAddItem = viewModel::onAddItem,
@@ -94,10 +85,10 @@ fun ProductoListScreen(
 @Composable
 fun ProductoListBody(
     uiState: ProductoUistate,
-    laptops: List<ProductoEntity>,
-    accesorios: List<ProductoEntity>,
-    desktops: List<ProductoEntity>,
-    laptopsGaming: List<ProductoEntity>,
+//    accesorios: List<ProductoEntity>,
+//    laptops: List<ProductoEntity>,
+//    desktops: List<ProductoEntity>,
+//    laptopsGaming: List<ProductoEntity>,
     onVerProducto: (ProductoEntity) -> Unit,
     innerPadding: PaddingValues,
     goToPromotion: (PromocionEntity) -> Unit,
@@ -115,9 +106,9 @@ fun ProductoListBody(
         item {
             val context = LocalContext.current
             val iconColor = if (isSystemInDarkTheme()) {
-                Color(ContextCompat.getColor(context, R.color.white)) // Color for dark theme
+                Color(ContextCompat.getColor(context, R.color.white))
             } else {
-                Color(ContextCompat.getColor(context, R.color.black))// Color for light theme
+                Color(ContextCompat.getColor(context, R.color.black))
             }
 
             ExposedDropdownMenuBox(
@@ -126,7 +117,6 @@ fun ProductoListBody(
                     goToSearchScreen()
                 }
             ) {
-//                OutlinedTextField(value = "", onValueChange = {})
                 OutlinedTextField(
                     value = "Buscar",
                     onValueChange = { },
@@ -136,7 +126,6 @@ fun ProductoListBody(
                         .menuAnchor()
                         .fillMaxWidth()
                         .padding(vertical = 10.dp),
-//                        .clip(RoundedCornerShape(50)),
                     shape = RoundedCornerShape(50),
                     trailingIcon = {
                         Icon(
@@ -163,7 +152,7 @@ fun ProductoListBody(
                             .padding(4.dp)
                     )
                 }
-                if (laptops.isEmpty()) {
+                if (uiState.laptops.isEmpty()) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize(),
@@ -177,7 +166,7 @@ fun ProductoListBody(
                     LazyRow(
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        items(laptops) { item ->
+                        items(uiState.laptops) { item ->
                             Row(modifier = Modifier
                                 .fillMaxWidth()
                                 .width(200.dp)
@@ -211,7 +200,7 @@ fun ProductoListBody(
                             .padding(4.dp)
                     )
                 }
-                if (accesorios.isEmpty()) {
+                if (uiState.accesorios.isEmpty()) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize(),
@@ -223,7 +212,7 @@ fun ProductoListBody(
                     LazyRow(
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        items(accesorios) { item ->
+                        items(uiState.accesorios) { item ->
                             Row(modifier = Modifier
                                 .fillMaxWidth()
                                 .width(200.dp)
@@ -256,7 +245,7 @@ fun ProductoListBody(
                             .padding(4.dp)
                     )
                 }
-                if (laptopsGaming.isEmpty()) {
+                if (uiState.laptopsGaming.isEmpty()) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize(),
@@ -269,7 +258,7 @@ fun ProductoListBody(
                     LazyRow(
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        items(laptopsGaming) { item ->
+                        items(uiState.laptopsGaming) { item ->
                             Row(modifier = Modifier
                                 .fillMaxWidth()
                                 .width(200.dp)
@@ -301,7 +290,7 @@ fun ProductoListBody(
                             .padding(4.dp)
                     )
                 }
-                if (laptops.isEmpty()) {
+                if (uiState.desktops.isEmpty()) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize(),
@@ -313,7 +302,7 @@ fun ProductoListBody(
                     LazyRow(
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        items(desktops) { item ->
+                        items(uiState.desktops) { item ->
                             Row(modifier = Modifier
                                 .fillMaxWidth()
                                 .width(200.dp)
@@ -374,8 +363,9 @@ fun ProductCard(producto: ProductoEntity, onAddToCart: (ItemEntity) -> Unit) {
 
 @Composable
 fun PromotionCard(uiState: ProductoUistate, goToProduct: (PromocionEntity) -> Unit) {
+
     val pagerState = rememberPagerState(pageCount = {
-        4
+        uiState.promociones?.size ?: 0
     })
     val scope = rememberCoroutineScope()
     Card(
@@ -401,19 +391,20 @@ fun PromotionCard(uiState: ProductoUistate, goToProduct: (PromocionEntity) -> Un
                 state = pagerState,
                 modifier = Modifier.fillMaxSize()
             ) { page ->
-                if (uiState.promociones.isNotEmpty()) {
-                    uiState.promociones[page].imagen.let {
-                        AsyncImage(
-                            model = it,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { goToProduct(uiState.promociones[page]) }
-                                .fillMaxHeight()
-                                .height(151.dp)
-                        )
-                    }
+                if (uiState.promociones.isNullOrEmpty()) {
+                    CircularProgressIndicator()
+                } else {
+                    AsyncImage(
+                        model = uiState.promociones!![page].imagen,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { goToProduct(uiState.promociones!![page]) }
+                            .fillMaxHeight()
+                            .height(151.dp)
+                    )
                 }
+
             }
             Row(
                 Modifier

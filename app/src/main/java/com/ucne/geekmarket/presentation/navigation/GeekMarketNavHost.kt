@@ -36,9 +36,9 @@ fun GeekMarketNavHost(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             CustomTopAppBar(
-                lable = "GeekMarket",
+                lable = "eekMarket",
                 topBarAction = { showDeleteButton = !showDeleteButton },
-                isInCarrito = currentRoute?.contains(Screen.CarritoList.toString())?: false,
+                isInCarrito = currentRoute?.contains(Screen.CarritoList.toString()) ?: false,
             )
         },
         bottomBar = {
@@ -114,15 +114,20 @@ fun GeekMarketNavHost(
                 )
             }
             composable<Screen.WishList> {
-                WishListScreen(innerPadding, true)
+                WishListScreen(
+                    innerPadding = innerPadding,
+                    deleteAllowed = true,
+                    goToProducto = {navHostController.navigate(Screen.ProductDetail(it.productoId))}
+                )
             }
             composable<Screen.Search> {
                 SearchScreen(
                     goToHomeScreen = { navHostController.navigate(Screen.ProductList) },
-                    goToProducto = {navHostController.navigate(Screen.ProductDetail(it.productoId))}
+                    goToProducto = { navHostController.navigate(Screen.ProductDetail(it.productoId)) }
                 )
             }
 
         }
     }
 }
+

@@ -89,9 +89,6 @@ fun CategoriaListBody(
     goToProduct: (PromocionEntity) -> Unit,
     onAddItem: (ItemEntity) -> Unit,
 ) {
-
-    var cantidad by remember { mutableStateOf(1) }
-
     Column (modifier = Modifier.padding(innerPadding)){
         Text(
             text = uiState.categoria?: "",

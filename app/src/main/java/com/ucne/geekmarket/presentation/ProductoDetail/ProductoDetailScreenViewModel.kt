@@ -70,8 +70,6 @@ class ProductoDetailScreenViewModel @Inject constructor(
         }
     }
 
-
-
     fun onSetProducto(productoId: Int) {
         viewModelScope.launch {
             val inWishList = wishRepository.itemExit(productoId,1)

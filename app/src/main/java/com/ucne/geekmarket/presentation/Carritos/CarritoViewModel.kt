@@ -27,8 +27,6 @@ class CarritoViewModel @Inject constructor(
     private val itemRepository: ItemRepository,
     private val productoRepository: ProductoRepository
 ) : ViewModel() {
-    private var carritoId: Int = 0
-
 
     private val _uiState = MutableStateFlow(carritoUistate())
     val uiState = _uiState.asStateFlow()
@@ -56,7 +54,7 @@ class CarritoViewModel @Inject constructor(
         getLastCarrito()
     }
 
-    fun getLastCarrito() {
+    private fun getLastCarrito() {
         viewModelScope.launch {
             val lastCarrito = carritoRepository.getLastCarrito()
             val productoList = productoRepository.getProductosItem(lastCarrito?.carritoId ?: 0)
@@ -78,7 +76,7 @@ class CarritoViewModel @Inject constructor(
 
 
 
-    fun saveCarrito() {
+    private fun saveCarrito() {
         viewModelScope.launch {
             val lastCarrito = carritoRepository.getLastCarrito()
             val itemList = itemRepository.carritoItems(lastCarrito?.carritoId ?: 0)
@@ -88,11 +86,21 @@ class CarritoViewModel @Inject constructor(
                     carritoId = uiState.value.carritoId,
                     personaId = 1,
                     total = total,
-                    pagado = false,
                 )
             }
             carritoRepository.saveCarrito(uiState.value.toEntity())
         }
+    }
+
+    fun realizarPago(){
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    pagado = true
+                )
+            }
+        }
+        saveCarrito()
     }
 
     fun deleteItem(item: ItemEntity) {

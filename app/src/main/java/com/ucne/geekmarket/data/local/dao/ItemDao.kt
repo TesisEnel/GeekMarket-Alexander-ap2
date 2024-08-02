@@ -50,9 +50,10 @@ interface ItemDao {
             SELECT COUNT(*) AS item_count
             FROM Items
             WHERE carritoId = (SELECT MAX(carritoId) FROM Carritos WHERE pagado = 0)
+            Limit 1
         """
     )
-    suspend fun getItemsCount(): Int
+    fun getItemsCount(): Flow<Int>
     @Query(
         """
             SELECT EXISTS 

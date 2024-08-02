@@ -26,7 +26,9 @@ class ProductoRepository @Inject constructor(
         }
     }
     fun getProductoByCategoria(categoria: String) = productoDao.getProductoByCategoria(categoria)
+
     suspend fun getSuspendCategoria(categoria: String) = productoDao.getSuspendByCategoria(categoria)
+
     suspend fun getApiToDb(){
         try {
             val productos = productoApi.getProductos()
@@ -37,8 +39,8 @@ class ProductoRepository @Inject constructor(
             Log.e("Error", e.message.toString())
         }
     }
-    suspend fun getProducto(id: Int) = productoDao.find(id)
 
+    suspend fun getProducto(id: Int) = productoDao.find(id)
 
 }
 

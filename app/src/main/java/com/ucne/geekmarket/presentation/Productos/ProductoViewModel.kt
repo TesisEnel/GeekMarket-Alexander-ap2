@@ -6,22 +6,16 @@ import androidx.lifecycle.viewModelScope
 import com.ucne.geekmarket.data.local.entities.ItemEntity
 import com.ucne.geekmarket.data.local.entities.ProductoEntity
 import com.ucne.geekmarket.data.local.entities.PromocionEntity
-import com.ucne.geekmarket.data.local.entities.WishEntity
 import com.ucne.geekmarket.data.remote.dto.ProductoDto
-import com.ucne.geekmarket.data.remote.dto.PromocionDto
-import com.ucne.geekmarket.data.repository.CarritoRepository
 import com.ucne.geekmarket.data.repository.ItemRepository
 import com.ucne.geekmarket.data.repository.ProductoRepository
 import com.ucne.geekmarket.data.repository.PromcionRepository
-import com.ucne.geekmarket.data.repository.Resource
-import com.ucne.geekmarket.data.repository.WishListRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -36,73 +30,89 @@ class ProductoViewModel @Inject constructor(
     private val _uiState = MutableStateFlow((ProductoUistate()))
     val uiState = _uiState.asStateFlow()
 
-    val laptops =  productoRepository.getProductoByCategoria("Laptop")
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = emptyList()
-        )
-
-    val descktops = productoRepository.getProductoByCategoria("Desktop")
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = emptyList()
-        )
-
-    val laptopsGaming = productoRepository.getProductoByCategoria("Laptop-Gaming")
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = emptyList()
-        )
-
-    val items = itemRepository.getItem()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = emptyList()
-        )
-
-    val promociones = promocionRepository.getPromocionesDb()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = emptyList()
-        )
-
-    val accesorios = productoRepository.getProductoByCategoria("Accesorio")
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = emptyList()
-        )
-
-    fun onAddItem(item: ItemEntity)
-    {
+    fun onAddItem(item: ItemEntity) {
         viewModelScope.launch {
             itemRepository.AddItem(item)
         }
     }
 
     init {
-        getProductos()
         getPromociones()
+        getProductos()
+        getLaptops()
+        getAccesorios()
+        getLaptopsGaming()
+        getDesktops()
     }
 
-    fun getProductos() {
+    private fun getProductos() {
         viewModelScope.launch {
             productoRepository.getApiToDb()
         }
     }
 
-    fun getPromociones() {
+
+    private fun getLaptops() {
+        viewModelScope.launch {
+            productoRepository.getProductoByCategoria("Laptop")
+                .collectLatest { laptops ->
+                    _uiState.update {
+                        it.copy(
+                            laptops = laptops
+                        )
+                    }
+                }
+        }
+    }
+
+    private fun getAccesorios() {
+        viewModelScope.launch {
+            productoRepository.getProductoByCategoria("Accesorio")
+                .collectLatest { accesorios ->
+                    _uiState.update {
+                        it.copy(
+                            accesorios = accesorios
+                        )
+                    }
+                }
+        }
+    }
+
+    private fun getLaptopsGaming() {
+        viewModelScope.launch {
+            productoRepository.getProductoByCategoria("Laptop-Gaming")
+                .collectLatest { laptopsGaming ->
+                    _uiState.update {
+                        it.copy(
+                            laptopsGaming = laptopsGaming
+                        )
+                    }
+                }
+        }
+    }
+
+    private fun getDesktops() {
+        viewModelScope.launch {
+            productoRepository.getProductoByCategoria("Desktop")
+                .collectLatest { desktops ->
+                    _uiState.update {
+                        it.copy(
+                            desktops = desktops
+                        )
+                    }
+                }
+        }
+    }
+
+    private fun getPromociones() {
         viewModelScope.launch {
             promocionRepository.getApiToDb()
-            _uiState.update {
-                it.copy(
-                    promociones = promociones.value
-                )
+            promocionRepository.getPromocionesDb().collectLatest { promociones ->
+                _uiState.update {
+                    it.copy(
+                        promociones = promociones
+                    )
+                }
             }
         }
     }
@@ -110,10 +120,11 @@ class ProductoViewModel @Inject constructor(
 
 
 data class ProductoUistate(
-    val laptops: List<ProductoEntity> = emptyList(),
-    val descktops: List<ProductoEntity> = emptyList(),
-    val productos: List<ProductoDto> = emptyList(),
-    val laptopsGaming: List<ProductoEntity> = emptyList(),
-    val promociones: List<PromocionEntity> = emptyList(),
+    var laptops: List<ProductoEntity> = emptyList(),
+    var desktops: List<ProductoEntity> = emptyList(),
+    var productos: List<ProductoDto> = emptyList(),
+    var accesorios: List<ProductoEntity> = emptyList(),
+    var laptopsGaming: List<ProductoEntity> = emptyList(),
+    var promociones: List<PromocionEntity>? = emptyList(),
     val errorMessage: String? = null
 )

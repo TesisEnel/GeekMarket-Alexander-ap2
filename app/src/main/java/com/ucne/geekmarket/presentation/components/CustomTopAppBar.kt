@@ -1,5 +1,6 @@
 package com.ucne.geekmarket.presentation.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,7 +28,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.ucne.geekmarket.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,15 +40,19 @@ fun CustomTopAppBar(
     isInCarrito: Boolean = false,
 ) {
     var selected by remember { mutableStateOf(false) }
+    val arrangement = if (isInCarrito) Arrangement.SpaceBetween else Arrangement.Center
 
     TopAppBar(
         title = {
             Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = arrangement,
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = lable)
+                Row (verticalAlignment = Alignment.CenterVertically,){
+                    Image(painter = painterResource(id = R.drawable.g_triangulo_vector), contentDescription ="Logo")
+                    Text(text = lable )
+                }
                 if (isInCarrito) {
                     IconButton(
                         onClick = {

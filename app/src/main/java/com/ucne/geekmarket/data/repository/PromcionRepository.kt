@@ -16,6 +16,7 @@ class PromcionRepository @Inject constructor(
     private val promocionDao: PromocionDao,
 ) {
     fun getPromocionesDb()= promocionDao.getAll()
+
     suspend fun getApiToDb(){
         try {
             val promociones = promocionApi.getPromociones()

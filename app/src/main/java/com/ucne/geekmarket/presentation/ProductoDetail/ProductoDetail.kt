@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddShoppingCart
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
@@ -121,7 +122,6 @@ private fun ProductDetail(
                 )
             }
             else {
-                //TODO: quitar que para agregar sea por aqui y no por el viewModel
                 Image(
                     painter = painterResource(id = R.drawable.pixel_heart_icon_fill),
                     contentDescription = "Agregar a la lista de deseos"
@@ -176,7 +176,7 @@ private fun ProductDetail(
                         }
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.ShoppingCart,
+                            imageVector = Icons.Filled.AddShoppingCart,
                             contentDescription = "Agregar al carrito"
                         )
                         Spacer(modifier = Modifier.width(5.dp))
