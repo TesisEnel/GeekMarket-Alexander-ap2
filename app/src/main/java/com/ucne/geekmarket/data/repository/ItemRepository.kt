@@ -11,18 +11,25 @@ class ItemRepository @Inject constructor(
     private val productoRepository: ProductoRepository,
     private val carritoRepository: CarritoRepository
 ) {
-    suspend fun saveItem(item: ItemEntity) = itemDao.save(item)
+    private suspend fun saveItem(item: ItemEntity) = itemDao.save(item)
 
-    suspend fun deleteItem(item: ItemEntity) = itemDao.delete(item)
+    suspend fun deleteItem(item: ItemEntity){
+        val items = itemDao.carritoItemSuspend(item.carritoId?:0)
+        itemDao.delete(item)
+        val total = getMontoTotal(item.carritoId?:0)
+        itemDao.calcularTotal(item.carritoId ?: 0, total)
+    }
+
+    suspend fun getMontoTotal(carritoId: Int) = itemDao.getMontoTotal(carritoId)
 
     suspend fun getItem(id: Int) = itemDao.find(id)
 
-    suspend fun carritoItems(id: Int) = itemDao.CarritoItem(id)
+    fun carritoItems(id: Int) = itemDao.carritoItem(id)
 
-    suspend fun itemExist(productoId: Int, carritoId: Int) =
+    private suspend fun itemExist(productoId: Int, carritoId: Int) =
         itemDao.itemExit(productoId, carritoId)
 
-    suspend fun getItemByProducto(productoId: Int, carritoId: Int) =
+    private suspend fun getItemByProducto(productoId: Int, carritoId: Int) =
         itemDao.findItemByProducto(productoId, carritoId)
 
     suspend fun AddItem(item: ItemEntity) {
@@ -57,9 +64,9 @@ class ItemRepository @Inject constructor(
                 )
             )
         }
-        val items = carritoItems(lastCarrito?.carritoId?:0)
-        val total = items?.sumOf { (it.monto ?: 0.0)  }
-        itemDao.calcularTotal(lastCarrito?.carritoId ?: 0, total ?: 0.0)
+        val items = itemDao.carritoItemSuspend(lastCarrito?.carritoId?:0)
+        val total = items.sumOf { (it.monto ?: 0.0)}
+        itemDao.calcularTotal(lastCarrito?.carritoId ?: 0, total)
     }
 
     fun getItem() = itemDao.getAll()

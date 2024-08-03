@@ -51,11 +51,13 @@ fun CarritoListScreen(
         innerPadding = innerPadding,
         onRemoveItem = viewModel::deleteItem,
         deleteAllowed = deleteAllowed,
+        realizarPago = viewModel::realizarPago,
     )
 }
 
 @Composable
 fun CarritoListScreenBody(
+    realizarPago: () -> Unit,
     uiState: carritoUistate,
     innerPadding: PaddingValues,
     onRemoveItem: (ItemEntity) -> Unit,
@@ -82,7 +84,9 @@ fun CarritoListScreenBody(
             }
         }
         Button(
-            onClick = { },
+            onClick = {
+                realizarPago()
+                      },
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)

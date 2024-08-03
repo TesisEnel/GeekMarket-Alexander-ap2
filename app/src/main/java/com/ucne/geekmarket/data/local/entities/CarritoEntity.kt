@@ -7,8 +7,8 @@ import androidx.room.PrimaryKey
 data class CarritoEntity(
     @PrimaryKey
     val carritoId: Int? = null,
-    val pagado: Boolean = false,
-    val total: Double= 0.0,
+    var pagado: Boolean = false,
+    var total: Double= 0.0,
     val personaId: Int? = null
 )
 

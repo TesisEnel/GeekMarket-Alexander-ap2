@@ -1,8 +1,5 @@
-package com.ucne.alexandersuarez_ap2_p1.presentation.navigation
-
-
+package com.ucne.geekmarket.presentation.navigation
 import kotlinx.serialization.Serializable
-
 
 sealed class Screen {
     @Serializable
@@ -15,12 +12,9 @@ sealed class Screen {
     data object Profile : Screen()
     @Serializable
     data object Search : Screen()
-
     @Serializable
     data class Categoria(val categoria: String) : Screen()
-
     @Serializable
     data class ProductDetail(val productoId: Int) : Screen()
-
 }
 

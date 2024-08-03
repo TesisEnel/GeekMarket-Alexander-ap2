@@ -39,7 +39,7 @@ interface ProductoDao {
             WHERE i.carritoId = :id;
         """
     )
-    suspend fun getProductoItem(id: Int): List<ProductoEntity>
+    fun getProductoByCarritoId(id: Int): Flow<List<ProductoEntity>>
     @Query(
         """
             SELECT *
