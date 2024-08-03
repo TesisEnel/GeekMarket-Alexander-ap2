@@ -33,7 +33,15 @@ interface ItemDao {
             WHERE carritoId = :id
         """
     )
-    suspend fun CarritoItem(id: Int): List<ItemEntity>?
+    fun carritoItem(id: Int): Flow<List<ItemEntity>>?
+    @Query(
+        """
+            SELECT * 
+            FROM Items
+            WHERE carritoId = :id
+        """
+    )
+    suspend fun carritoItemSuspend(id: Int): List<ItemEntity>
 
     @Query(
         """ 
@@ -54,6 +62,15 @@ interface ItemDao {
         """
     )
     fun getItemsCount(): Flow<Int>
+    @Query(
+        """
+            SELECT sum(monto) AS item_count
+            FROM Items
+            WHERE carritoId = :carritoId
+            Limit 1
+        """
+    )
+    suspend fun getMontoTotal(carritoId: Int): Double
     @Query(
         """
             SELECT EXISTS 

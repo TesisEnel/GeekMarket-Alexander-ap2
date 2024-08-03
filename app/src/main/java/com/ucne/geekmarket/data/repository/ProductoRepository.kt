@@ -15,7 +15,7 @@ class ProductoRepository @Inject constructor(
 ) {
     fun getProductosDb()= productoDao.getAll()
 
-    suspend fun getProductosItem(id: Int)= productoDao.getProductoItem(id)
+    fun getProductoByCarritoId(id: Int)= productoDao.getProductoByCarritoId(id)
 
     suspend fun searchProducto(query: String) : List<ProductoEntity> {
         if(query.isEmpty()){
@@ -25,18 +25,21 @@ class ProductoRepository @Inject constructor(
             return productoDao.searchProducto(query)
         }
     }
-    fun getProductoByCategoria(categoria: String) = productoDao.getProductoByCategoria(categoria)
 
-    suspend fun getSuspendCategoria(categoria: String) = productoDao.getSuspendByCategoria(categoria)
+    suspend fun getPoductosByCategoria(categoria: String) = productoDao.getSuspendByCategoria(categoria)
 
-    suspend fun getApiToDb(){
+
+    fun loadToDb(): Flow<Resource<List<ProductoEntity>>> = flow {
+        emit(Resource.Loading())
         try {
             val productos = productoApi.getProductos()
             productos.forEach {
                 productoDao.save(it.toEntity())
             }
+            emit(Resource.Success(emptyList()))
         }catch (e: Exception){
             Log.e("Error", e.message.toString())
+            emit(Resource.Error("Error de red: " + e.message.toString()))
         }
     }
 

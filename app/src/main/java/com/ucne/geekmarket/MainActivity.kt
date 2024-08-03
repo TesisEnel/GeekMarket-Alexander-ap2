@@ -4,16 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.compose.rememberNavController
-import com.ucne.alexandersuarez_ap2_p1.presentation.navigation.GeekMarketNavHost
+import com.ucne.geekmarket.presentation.components.MainScaffold
+import com.ucne.geekmarket.presentation.navigation.GeekMarketNavHost
 import com.ucne.geekmarket.ui.theme.GeekMarketTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -25,7 +22,13 @@ class MainActivity : ComponentActivity() {
         setContent {
             GeekMarketTheme {
                 val navHost = rememberNavController()
-                GeekMarketNavHost(navHost)
+                var showDeleteButton by remember { mutableStateOf(false) }
+                MainScaffold(
+                    navHostController = navHost,
+                    showDeleteButton = { showDeleteButton = !showDeleteButton }
+                ){ innerPadding->
+                    GeekMarketNavHost(navHost, innerPadding, showDeleteButton)
+                }
             }
         }
     }

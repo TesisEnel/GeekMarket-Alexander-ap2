@@ -6,16 +6,16 @@ import androidx.lifecycle.viewModelScope
 import com.ucne.geekmarket.data.local.entities.ItemEntity
 import com.ucne.geekmarket.data.local.entities.ProductoEntity
 import com.ucne.geekmarket.data.local.entities.PromocionEntity
-import com.ucne.geekmarket.data.remote.dto.ProductoDto
 import com.ucne.geekmarket.data.repository.ItemRepository
 import com.ucne.geekmarket.data.repository.ProductoRepository
 import com.ucne.geekmarket.data.repository.PromcionRepository
+import com.ucne.geekmarket.data.repository.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -37,72 +37,39 @@ class ProductoViewModel @Inject constructor(
     }
 
     init {
+        loadProductos()
         getPromociones()
         getProductos()
-        getLaptops()
-        getAccesorios()
-        getLaptopsGaming()
-        getDesktops()
     }
 
     private fun getProductos() {
         viewModelScope.launch {
-            productoRepository.getApiToDb()
-        }
-    }
-
-
-    private fun getLaptops() {
-        viewModelScope.launch {
-            productoRepository.getProductoByCategoria("Laptop")
-                .collectLatest { laptops ->
-                    _uiState.update {
-                        it.copy(
-                            laptops = laptops
-                        )
-                    }
+            productoRepository.getProductosDb().collectLatest {
+                result ->
+                _uiState.update {
+                    it.copy(
+                        laptops = result.filter { it.categoria == "Laptop" },
+                        accesorios = result.filter { it.categoria == "Accesorio" },
+                        laptopsGaming = result.filter { it.categoria == "Laptop-Gaming" },
+                        desktops = result.filter { it.categoria == "Desktop" }
+                    )
                 }
+            }
         }
     }
 
-    private fun getAccesorios() {
+    private fun loadProductos(){
         viewModelScope.launch {
-            productoRepository.getProductoByCategoria("Accesorio")
-                .collectLatest { accesorios ->
-                    _uiState.update {
-                        it.copy(
-                            accesorios = accesorios
-                        )
-                    }
+            productoRepository.loadToDb().collect{
+                _uiState.update {
+                    it.copy(
+                       errorMessage = it.errorMessage
+                    )
                 }
+            }
         }
     }
 
-    private fun getLaptopsGaming() {
-        viewModelScope.launch {
-            productoRepository.getProductoByCategoria("Laptop-Gaming")
-                .collectLatest { laptopsGaming ->
-                    _uiState.update {
-                        it.copy(
-                            laptopsGaming = laptopsGaming
-                        )
-                    }
-                }
-        }
-    }
-
-    private fun getDesktops() {
-        viewModelScope.launch {
-            productoRepository.getProductoByCategoria("Desktop")
-                .collectLatest { desktops ->
-                    _uiState.update {
-                        it.copy(
-                            desktops = desktops
-                        )
-                    }
-                }
-        }
-    }
 
     private fun getPromociones() {
         viewModelScope.launch {
@@ -120,11 +87,11 @@ class ProductoViewModel @Inject constructor(
 
 
 data class ProductoUistate(
-    var laptops: List<ProductoEntity> = emptyList(),
-    var desktops: List<ProductoEntity> = emptyList(),
-    var productos: List<ProductoDto> = emptyList(),
-    var accesorios: List<ProductoEntity> = emptyList(),
-    var laptopsGaming: List<ProductoEntity> = emptyList(),
     var promociones: List<PromocionEntity>? = emptyList(),
+    var accesorios: List<ProductoEntity> = emptyList(),
+    var laptops: List<ProductoEntity> = emptyList(),
+    var laptopsGaming: List<ProductoEntity> = emptyList(),
+    var desktops: List<ProductoEntity> = emptyList(),
+    val isLoading: Boolean = false,
     val errorMessage: String? = null
 )
