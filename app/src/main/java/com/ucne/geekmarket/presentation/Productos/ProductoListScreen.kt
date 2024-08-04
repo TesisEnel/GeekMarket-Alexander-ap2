@@ -69,7 +69,6 @@ fun ProductoListScreen(
     goToSearchScreen: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
     ProductoListBody(
         onVerProducto = onVerProducto,
         innerPadding = innerPadding,

@@ -10,7 +10,10 @@ import com.ucne.geekmarket.presentation.Carritos.CarritoListScreen
 import com.ucne.geekmarket.presentation.ProductoDetail.ProductDetailed
 import com.ucne.geekmarket.presentation.Productos.ProductoListScreen
 import com.ucne.geekmarket.presentation.Search.SearchScreen
+import com.ucne.geekmarket.presentation.login.LoginScreen
+import com.ucne.geekmarket.presentation.signup.SignupScreen
 import com.ucne.geekmarket.presentation.categoria.CategoriaListScreen
+import com.ucne.geekmarket.presentation.profile.ProfileScreen
 import com.ucne.geekmarket.presentation.wish.WishListScreen
 
 @Composable
@@ -19,7 +22,23 @@ fun GeekMarketNavHost(
     innerPadding: PaddingValues,
     showDeleteButton: Boolean = false
 ) {
+
     NavHost(navController = navHostController, startDestination = Screen.ProductList) {
+        composable<Screen.Login> {
+            LoginScreen(navController = navHostController)
+        }
+        composable<Screen.Signup> {
+            SignupScreen(
+                navController = navHostController)
+        }
+        composable<Screen.Profile> {
+            ProfileScreen(
+                innerPadding = innerPadding,
+                goToLogin = {
+                    navHostController.navigate(Screen.Login)
+                }
+            )
+        }
         composable<Screen.ProductList> {
             ProductoListScreen(
                 onVerProducto = {
@@ -60,7 +79,13 @@ fun GeekMarketNavHost(
             )
         }
         composable<Screen.CarritoList> {
-            CarritoListScreen(innerPadding, showDeleteButton)
+            CarritoListScreen(
+                innerPadding = innerPadding,
+                deleteAllowed = showDeleteButton,
+                goToLoging = {
+                    navHostController.navigate(Screen.Login)
+                }
+            )
         }
         composable<Screen.Categoria> { categoria ->
             CategoriaListScreen(

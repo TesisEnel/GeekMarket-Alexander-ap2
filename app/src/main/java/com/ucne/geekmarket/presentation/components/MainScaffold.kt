@@ -8,8 +8,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.ucne.geekmarket.presentation.navigation.Screen
 import com.ucne.geekmarket.presentation.components.buttombar.BottonBar
+import com.ucne.geekmarket.presentation.navigation.Screen
 
 @Composable
 fun MainScaffold(
@@ -18,23 +18,29 @@ fun MainScaffold(
     content: @Composable (PaddingValues) -> Unit
 ) {
     val navBackStackEntry by navHostController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
+    val currentRoute = navBackStackEntry?.destination?.route?: Screen.ProductList.toString()
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+
         topBar = {
-            CustomTopAppBar(
-                lable = "eekMarket",
-                showDeleteButton = showDeleteButton,
-                isInCarrito = currentRoute?.contains(Screen.CarritoList.toString()) ?: false,
-            )
+            if(!currentRoute.contains(Screen.Login.toString()) && !currentRoute.contains(Screen.Signup.toString())){
+                CustomTopAppBar(
+                    lable = "eekMarket",
+                    showDeleteButton = showDeleteButton,
+                    isInCarrito = currentRoute.contains(Screen.CarritoList.toString()),
+                )
+            }
         },
         bottomBar = {
-            BottonBar(
-                goToListaProducto = { navHostController.navigate(Screen.ProductList) },
-                goToCarrito = { navHostController.navigate(Screen.CarritoList) },
-                currentRoute = currentRoute,
-                goToWishList = { navHostController.navigate(Screen.WishList) }
-            )
+            if(!currentRoute.contains(Screen.Login.toString()) && !currentRoute.contains(Screen.Signup.toString())){
+                BottonBar(
+                    goToListaProducto = { navHostController.navigate(Screen.ProductList) },
+                    goToCarrito = { navHostController.navigate(Screen.CarritoList) },
+                    currentRoute = currentRoute,
+                    goToWishList = { navHostController.navigate(Screen.WishList) },
+                    goToProfile = { navHostController.navigate(Screen.Profile) }
+                )
+            }
         }
     ) { innerPadding ->
         content(innerPadding)

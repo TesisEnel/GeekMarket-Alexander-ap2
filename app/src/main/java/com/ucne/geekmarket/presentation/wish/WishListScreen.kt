@@ -2,10 +2,13 @@ package com.ucne.geekmarket.presentation.wish
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -30,6 +33,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -44,6 +48,7 @@ import coil.compose.AsyncImage
 import com.ucne.geekmarket.data.local.entities.ItemEntity
 import com.ucne.geekmarket.data.local.entities.ProductoEntity
 import com.ucne.geekmarket.presentation.Common.formatNumber
+import com.ucne.geekmarket.presentation.components.EmptyContent
 
 @Composable
 fun WishListScreen(
@@ -77,29 +82,44 @@ fun CarritoListScreenBody(
 ) {
     var showDialog by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf<ProductoEntity?>(null) }
-    LazyColumn(modifier = Modifier.padding(innerPadding)) {
-        item {
-            Text(
-                text = "Wish List",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(8.dp)
-            )
+    Box(
+        modifier = Modifier
+            .padding(innerPadding)
+            .fillMaxWidth()
+            .fillMaxHeight()
+    ) {
+        LazyColumn(
+            modifier = Modifier.fillMaxHeight(),
+        ) {
+            item {
+                Text(
+                    text = "Wish List",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(8.dp)
+                )
+            }
+            items(uiState.productos ?: emptyList()) { producto ->
+                CartItemCard(
+                    producto = producto,
+                    onDeleteWish = {
+                        showDialog = !showDialog
+                        selectedItem = it
+                    },
+                    deleteAllowed = deleteAllowed,
+                    goToProducto = goToProducto
+                )
+            }
         }
-        items(uiState.productos ?: emptyList()) { producto ->
-            CartItemCard(
-                producto = producto,
-                onDeleteWish = {
-                    showDialog = !showDialog
-                    selectedItem = it
-                },
-                deleteAllowed = deleteAllowed,
-                goToProducto = goToProducto
-            )
+        if(uiState.productos.isNullOrEmpty()){
+            Column(Modifier.align(Alignment.Center)){
+                EmptyContent()
+            }
         }
+
     }
     if (showDialog) {
-        var cantidad by remember { mutableStateOf(1) }
+        var cantidad by remember { mutableIntStateOf(1) }
         AlertDialog(
             onDismissRequest = {
 

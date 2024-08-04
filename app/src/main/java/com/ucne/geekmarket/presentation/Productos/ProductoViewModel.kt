@@ -1,11 +1,14 @@
 package com.ucne.geekmarket.presentation.Productos
 
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ucne.geekmarket.data.local.entities.ItemEntity
 import com.ucne.geekmarket.data.local.entities.ProductoEntity
 import com.ucne.geekmarket.data.local.entities.PromocionEntity
+import com.ucne.geekmarket.data.repository.AuthRepository
 import com.ucne.geekmarket.data.repository.ItemRepository
 import com.ucne.geekmarket.data.repository.ProductoRepository
 import com.ucne.geekmarket.data.repository.PromcionRepository
@@ -24,11 +27,13 @@ import javax.inject.Inject
 class ProductoViewModel @Inject constructor(
     private val productoRepository: ProductoRepository,
     private val itemRepository: ItemRepository,
-    private val promocionRepository: PromcionRepository
+    private val promocionRepository: PromcionRepository,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow((ProductoUistate()))
     val uiState = _uiState.asStateFlow()
+
 
     fun onAddItem(item: ItemEntity) {
         viewModelScope.launch {

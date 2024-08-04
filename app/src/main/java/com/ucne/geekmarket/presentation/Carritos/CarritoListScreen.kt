@@ -25,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,24 +35,31 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.ucne.geekmarket.data.local.entities.ItemEntity
+import com.ucne.geekmarket.presentation.Common.AuthState
 import com.ucne.geekmarket.presentation.Common.formatNumber
 import com.ucne.geekmarket.presentation.components.CenteredTextDivider
+import com.ucne.geekmarket.presentation.components.EmptyContent
 
 @Composable
 fun CarritoListScreen(
     innerPadding: PaddingValues,
     deleteAllowed: Boolean,
     viewModel: CarritoViewModel = hiltViewModel(),
+    goToLoging: () -> Unit
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
+    val authState by viewModel.authState.observeAsState()
     CarritoListScreenBody(
         uiState = uiState,
         innerPadding = innerPadding,
         onRemoveItem = viewModel::deleteItem,
         deleteAllowed = deleteAllowed,
-        realizarPago = viewModel::realizarPago,
+        realizarPago = {
+            viewModel.realizarPago()
+        },
+        authState = authState,
+        goToLoging = goToLoging
     )
 }
 
@@ -61,7 +69,9 @@ fun CarritoListScreenBody(
     uiState: carritoUistate,
     innerPadding: PaddingValues,
     onRemoveItem: (ItemEntity) -> Unit,
-    deleteAllowed: Boolean
+    deleteAllowed: Boolean,
+    authState: AuthState?,
+    goToLoging: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -79,20 +89,35 @@ fun CarritoListScreenBody(
                 )
             }
             item {
-                val total = uiState.total
-                CenteredTextDivider(text = "Total: $${formatNumber(total)} ")
+                if(!uiState.items.isNullOrEmpty()){
+                    val total = uiState.total
+                    CenteredTextDivider(text = "Total: $${formatNumber(total)} ")
+                }
             }
         }
-        Button(
-            onClick = {
-                realizarPago()
-                      },
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.BottomCenter)
-                .padding(horizontal = 5.dp)
-        ) {
-            Text("Realizar compra")
+        if (uiState.items.isNullOrEmpty()) {
+            Row (Modifier.align(Alignment.Center)){
+                EmptyContent()
+
+            }
+        }
+        else{
+            Button(
+                onClick = {
+                    if (authState is AuthState.Unauthenticated) {
+                        goToLoging()
+                    }
+                    else if(authState is AuthState.Authenticated){
+                        realizarPago()
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .padding(horizontal = 5.dp)
+            ) {
+                Text("Realizar compra")
+            }
         }
     }
 

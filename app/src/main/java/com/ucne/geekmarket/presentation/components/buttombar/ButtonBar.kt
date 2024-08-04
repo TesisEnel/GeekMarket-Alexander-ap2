@@ -41,6 +41,7 @@ fun BottonBar(
     goToListaProducto: () -> Unit,
     goToCarrito: () -> Unit,
     goToWishList: () -> Unit,
+    goToProfile: () -> Unit,
     currentRoute: String?,
     viewModel: ButtonBarViewModel = hiltViewModel()
 ) {
@@ -114,6 +115,7 @@ fun BottonBar(
                             Screen.ProductList.toString() -> goToListaProducto()
                             Screen.CarritoList.toString() -> goToCarrito()
                             Screen.WishList.toString() -> goToWishList()
+                            Screen.Profile.toString() -> goToProfile()
                             else -> goToListaProducto()
                         }
                     },

@@ -3,6 +3,7 @@ package com.ucne.geekmarket.data.di
 import android.app.Application
 import android.content.Context
 import androidx.room.Room
+import com.google.firebase.auth.FirebaseAuth
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.ucne.geekmarket.data.local.database.GeekMarketDb
@@ -64,6 +65,9 @@ object AppModule {
     fun provideProductoDao(database: GeekMarketDb) = database.productoDao()
     @Provides
     fun provideItemDao(database: GeekMarketDb) = database.itemDao()
+
+    @Provides
+    fun provideFireBase() = FirebaseAuth.getInstance()
 
     @Provides
     fun provideCarritoDao(database: GeekMarketDb) = database.carritoDao()
