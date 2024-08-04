@@ -13,6 +13,10 @@ sealed class Screen {
     @Serializable
     data object Search : Screen()
     @Serializable
+    data object Login : Screen()
+    @Serializable
+    data object Signup : Screen()
+    @Serializable
     data class Categoria(val categoria: String) : Screen()
     @Serializable
     data class ProductDetail(val productoId: Int) : Screen()

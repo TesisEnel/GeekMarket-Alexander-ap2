@@ -10,5 +10,5 @@ data class PersonaEntity(
     val nombre: String?=null,
     val apellido: String?=null,
     val edad: Int?=null,
-    val Correo: String?=null
+    val correo: String?=null
 )

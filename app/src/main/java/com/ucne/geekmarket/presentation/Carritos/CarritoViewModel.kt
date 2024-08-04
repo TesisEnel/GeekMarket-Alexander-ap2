@@ -1,19 +1,20 @@
 package com.ucne.geekmarket.presentation.Carritos
 
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ucne.geekmarket.data.local.entities.CarritoEntity
 import com.ucne.geekmarket.data.local.entities.ItemEntity
 import com.ucne.geekmarket.data.local.entities.ProductoEntity
+import com.ucne.geekmarket.data.repository.AuthRepository
 import com.ucne.geekmarket.data.repository.CarritoRepository
 import com.ucne.geekmarket.data.repository.ItemRepository
 import com.ucne.geekmarket.data.repository.ProductoRepository
+import com.ucne.geekmarket.presentation.Common.AuthState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,14 +23,27 @@ import javax.inject.Inject
 class CarritoViewModel @Inject constructor(
     private val carritoRepository: CarritoRepository,
     private val itemRepository: ItemRepository,
-    private val productoRepository: ProductoRepository
+    private val productoRepository: ProductoRepository,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(carritoUistate())
     val uiState = _uiState.asStateFlow()
 
+    private val _authState = MutableLiveData<AuthState>()
+    val authState: MutableLiveData<AuthState> = _authState
+
     init {
         getLastCarrito()
+        checkAuthStatus()
+    }
+
+    private fun checkAuthStatus(){
+        viewModelScope.launch {
+            authRepository.checkAuthStatus().collect{
+                _authState.value = it
+            }
+        }
     }
 
     private fun getLastCarrito() {

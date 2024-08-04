@@ -24,7 +24,7 @@ import com.ucne.geekmarket.data.local.entities.WishEntity
         PromocionEntity::class,
         WishEntity::class],
 
-    version = 11,
+    version = 12,
     exportSchema = false
 )
 abstract class GeekMarketDb: RoomDatabase() {
