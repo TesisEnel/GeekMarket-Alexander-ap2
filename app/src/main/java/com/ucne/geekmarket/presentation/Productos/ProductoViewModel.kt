@@ -12,13 +12,11 @@ import com.ucne.geekmarket.data.repository.AuthRepository
 import com.ucne.geekmarket.data.repository.ItemRepository
 import com.ucne.geekmarket.data.repository.ProductoRepository
 import com.ucne.geekmarket.data.repository.PromcionRepository
-import com.ucne.geekmarket.data.repository.Resource
+import com.ucne.geekmarket.presentation.Common.AuthState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,16 +26,18 @@ class ProductoViewModel @Inject constructor(
     private val productoRepository: ProductoRepository,
     private val itemRepository: ItemRepository,
     private val promocionRepository: PromcionRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow((ProductoUistate()))
     val uiState = _uiState.asStateFlow()
 
+    private val _authState = MutableLiveData<AuthState>()
+    val authState: LiveData<AuthState> = _authState
 
     fun onAddItem(item: ItemEntity) {
         viewModelScope.launch {
-            itemRepository.AddItem(item)
+//            itemRepository.AddItem(item)
         }
     }
 
@@ -62,6 +62,8 @@ class ProductoViewModel @Inject constructor(
             }
         }
     }
+
+
 
     private fun loadProductos(){
         viewModelScope.launch {

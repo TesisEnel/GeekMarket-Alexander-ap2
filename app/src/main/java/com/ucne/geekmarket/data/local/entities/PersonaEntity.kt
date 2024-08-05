@@ -9,6 +9,6 @@ data class PersonaEntity(
     val personaId: Int?=null,
     val nombre: String?=null,
     val apellido: String?=null,
-    val edad: Int?=null,
-    val correo: String?=null
+    val fechaNacimiento: String? = null,
+    val email: String?=null
 )

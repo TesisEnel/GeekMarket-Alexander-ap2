@@ -25,18 +25,30 @@ fun GeekMarketNavHost(
 
     NavHost(navController = navHostController, startDestination = Screen.ProductList) {
         composable<Screen.Login> {
-            LoginScreen(navController = navHostController)
+            LoginScreen(
+                goToSignup = {
+                    navHostController.navigate(Screen.Signup)
+                },
+                goToProductList = {
+                    navHostController.navigate(Screen.ProductList)
+                }
+            )
         }
         composable<Screen.Signup> {
             SignupScreen(
-                navController = navHostController)
+                goToLogin = {
+                    navHostController.navigate(Screen.Login)
+                }
+            )
         }
+
         composable<Screen.Profile> {
             ProfileScreen(
                 innerPadding = innerPadding,
                 goToLogin = {
                     navHostController.navigate(Screen.Login)
-                }
+                },
+
             )
         }
         composable<Screen.ProductList> {

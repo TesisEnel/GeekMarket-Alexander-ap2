@@ -25,6 +25,7 @@ import com.ucne.geekmarket.ui.theme.GeekMarketTheme
 
 @Composable
 fun EmptyContent(
+    titulo: String
 ) {
     Column(
         modifier = Modifier
@@ -42,7 +43,7 @@ fun EmptyContent(
 
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "No hay productos",
+            text = titulo,
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
@@ -54,6 +55,6 @@ fun EmptyContent(
 @Composable
 fun EmptyContentPreview() {
     GeekMarketTheme {
-        EmptyContent()
+        EmptyContent("No hay productos")
     }
 }

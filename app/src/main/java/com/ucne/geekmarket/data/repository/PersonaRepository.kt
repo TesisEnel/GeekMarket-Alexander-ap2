@@ -15,5 +15,12 @@ class PersonaRepository @Inject constructor(
 
     suspend fun getPersona(id: Int)= personaDao.find(id)
 
+    suspend fun getPersonaByEmail(email: String)= personaDao.getPersonaByEmail(email)
+
+    suspend fun updatePersonaId(personaId: Int){
+        personaDao.updateCarritoPersonaId(personaId)
+        personaDao.updateWishPersonaId(personaId)
+    }
+
     fun getPersona()= personaDao.getAll()
 }

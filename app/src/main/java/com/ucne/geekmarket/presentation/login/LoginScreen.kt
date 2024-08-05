@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material3.Button
@@ -20,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -44,26 +47,53 @@ import com.ucne.geekmarket.presentation.navigation.Screen
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
-    navController: NavController,
+    goToSignup: () -> Unit,
+    goToProductList: () -> Unit,
     authViewModel: LoginViewModel = hiltViewModel()
 ) {
 
-    var showPassword by remember { mutableStateOf(false) }
     val authState = authViewModel.authState.observeAsState()
     val context = LocalContext.current
     val uiState by authViewModel.uiState.collectAsState()
 
     LaunchedEffect(authState.value) {
         when (authState.value) {
-            is AuthState.Authenticated -> navController.navigate(Screen.ProductList)
+            is AuthState.Authenticated -> {
+                authViewModel.cambiarPersonaId()
+                goToProductList()
+            }
             is AuthState.Error -> Toast.makeText(
                 context,
                 (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT
             ).show()
+
             else -> Unit
         }
     }
 
+    LoginScreenBody(
+        modifier = modifier,
+        uiState = uiState,
+        authState = authState,
+        goToSignup = goToSignup,
+        onEmailChanged = authViewModel::onEmailChanged,
+        onPasswordChanged = authViewModel::onPasswordChanged,
+        login = authViewModel::login
+    )
+
+}
+
+@Composable
+private fun LoginScreenBody(
+    modifier: Modifier,
+    uiState: LoginUistate,
+    onEmailChanged: (String) -> Unit,
+    onPasswordChanged: (String) -> Unit,
+    login: () -> Unit,
+    authState: State<AuthState?>,
+    goToSignup: () -> Unit
+) {
+    var showPassword by remember { mutableStateOf(false) }
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -82,9 +112,15 @@ fun LoginScreen(
 
         OutlinedTextField(
             value = uiState.email ?: "",
-            onValueChange = {authViewModel.onEmailChanged(it)},
+            onValueChange = onEmailChanged,
             label = {
                 Text(text = "Email")
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Email,
+                    contentDescription = "Email Icon"
+                )
             },
             shape = RoundedCornerShape(16.dp)
         )
@@ -93,11 +129,15 @@ fun LoginScreen(
 
         OutlinedTextField(
             value = uiState.password ?: "",
-            onValueChange = {
-                authViewModel.onPasswordChanged(it)
-            },
+            onValueChange = onPasswordChanged,
             label = {
                 Text(text = "Password")
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Lock,
+                    contentDescription = "Email Icon"
+                )
             },
             trailingIcon = {
                 IconButton(onClick = {
@@ -120,44 +160,20 @@ fun LoginScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             shape = RoundedCornerShape(16.dp)
         )
+
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = {
-                authViewModel.login()
-            },
+            onClick = login,
             enabled = authState.value != AuthState.Loading
         ) {
             Text(text = "Login")
         }
 
-
         Spacer(modifier = Modifier.height(8.dp))
 
-        TextButton(onClick = {
-            navController.navigate(Screen.Signup)
-        }) {
+        TextButton(onClick = goToSignup) {
             Text(text = "Don't have an account, Signup")
         }
-
     }
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

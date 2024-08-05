@@ -31,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ucne.geekmarket.presentation.navigation.Screen
 import com.ucne.geekmarket.presentation.components.ButtomNavigationItem
 import com.ucne.geekmarket.ui.theme.CardColor
@@ -45,10 +44,10 @@ fun BottonBar(
     currentRoute: String?,
     viewModel: ButtonBarViewModel = hiltViewModel()
 ) {
-    val itemList by viewModel.items.collectAsStateWithLifecycle()
+//    val itemList by viewModel.items.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsState()
     val quantity = uiState.quantity
-    viewModel.getPromociones()
+    viewModel.getQuantity()
 
     Box(contentAlignment = Alignment.BottomCenter) {
         NavigationBar(

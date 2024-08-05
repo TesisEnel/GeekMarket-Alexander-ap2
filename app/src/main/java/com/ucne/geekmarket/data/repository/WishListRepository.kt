@@ -10,15 +10,15 @@ class WishListRepository @Inject constructor(
 ) {
     suspend fun saveWish(wishList: WishEntity)=wishDao.save(wishList)
 
-    suspend fun itemExit(productoId: Int, PersonaId: Int)= wishDao.itemExit(productoId, PersonaId)
+    suspend fun itemExist(productoId: Int, PersonaId: Int)= wishDao.itemExit(productoId, PersonaId)
 
     suspend fun deleteWish(wishList: WishEntity)= wishDao.delete(wishList)
 
-    suspend fun productosByPersona(id: Int)= wishDao.productosByPersona(id)
+    fun productosByPersona(personaId: Int)= wishDao.productosByPersona(personaId)
 
     suspend fun getWish(id: Int)= wishDao.find(id)
 
-    suspend fun WishListByProducto(productoId: Int)= wishDao.WishListByProducto(productoId)
+    suspend fun WishListByProducto(productoId: Int, personaId: Int)= wishDao.wishListByProducto(productoId, personaId)
 
     fun getWishes()= wishDao.getAll()
 }
