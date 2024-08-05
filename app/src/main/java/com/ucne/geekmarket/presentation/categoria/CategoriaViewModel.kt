@@ -37,7 +37,7 @@ class CategoriaViewModel @Inject constructor(
 
     fun onAddItem(item: ItemEntity) {
         viewModelScope.launch {
-            itemRepository.AddItem(item)
+//            itemRepository.AddItem(item)
         }
     }
 

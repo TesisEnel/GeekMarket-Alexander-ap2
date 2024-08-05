@@ -31,20 +31,20 @@ interface WishDao {
             SELECT p.*
             FROM Productos p
             JOIN Wishes w ON p.productoId = w.productoId
-            WHERE w.personaId = :id;
+            WHERE w.personaId = :personaId;
         """
     )
-    suspend fun productosByPersona(id: Int): List<ProductoEntity>?
+    fun productosByPersona(personaId: Int): Flow<List<ProductoEntity>>?
 
     @Query(
         """ 
         SELECT * 
         FROM Wishes 
-        WHERE productoId = :productoId 
+        WHERE productoId = :productoId AND  PersonaId = :personaId
         LIMIT 1
         """
     )
-    suspend fun WishListByProducto(productoId: Int): WishEntity?
+    suspend fun wishListByProducto(productoId: Int, personaId: Int): WishEntity?
 
     @Query(
         """

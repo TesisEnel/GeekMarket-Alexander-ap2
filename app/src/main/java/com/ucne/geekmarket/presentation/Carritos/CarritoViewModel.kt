@@ -10,6 +10,7 @@ import com.ucne.geekmarket.data.local.entities.ProductoEntity
 import com.ucne.geekmarket.data.repository.AuthRepository
 import com.ucne.geekmarket.data.repository.CarritoRepository
 import com.ucne.geekmarket.data.repository.ItemRepository
+import com.ucne.geekmarket.data.repository.PersonaRepository
 import com.ucne.geekmarket.data.repository.ProductoRepository
 import com.ucne.geekmarket.presentation.Common.AuthState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,6 +25,7 @@ class CarritoViewModel @Inject constructor(
     private val carritoRepository: CarritoRepository,
     private val itemRepository: ItemRepository,
     private val productoRepository: ProductoRepository,
+    private val personaRepository: PersonaRepository,
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
@@ -34,24 +36,29 @@ class CarritoViewModel @Inject constructor(
     val authState: MutableLiveData<AuthState> = _authState
 
     init {
-        getLastCarrito()
         checkAuthStatus()
+        getLastCarritoByPersona()
     }
 
-    private fun checkAuthStatus(){
+    private fun checkAuthStatus() {
         viewModelScope.launch {
-            authRepository.checkAuthStatus().collect{
+            authRepository.checkAuthStatus().collect {
                 _authState.value = it
             }
         }
     }
 
-    private fun getLastCarrito() {
+    private fun getLastCarritoByPersona() {
         viewModelScope.launch {
-            val lastCarrito = carritoRepository.getLastCarrito()
+            val persona = personaRepository.getPersonaByEmail(
+                if (_authState.value is AuthState.Authenticated)
+                    (_authState.value as AuthState.Authenticated).email
+                else ""
+            )
+            val lastCarrito = carritoRepository.getLastCarritoByPersona(persona?.personaId ?: 0)
             getProductos(lastCarrito)
             getItems(lastCarrito)
-            if (lastCarrito?.pagado == false && (lastCarrito.carritoId ?: 0) > 0) {
+            if (lastCarrito?.pagado == false) {
                 _uiState.update {
                     it.copy(
                         carritoId = lastCarrito.carritoId,
@@ -60,11 +67,27 @@ class CarritoViewModel @Inject constructor(
                         pagado = lastCarrito.pagado,
                     )
                 }
+                getPersonaByEmail()
             }
         }
     }
 
-    private  fun getItems(lastCarrito: CarritoEntity?) {
+    private fun getPersonaByEmail() {
+        if (_authState.value is AuthState.Unauthenticated) return
+
+        val email = (_authState.value as AuthState.Authenticated).email
+        viewModelScope.launch {
+            val persona = personaRepository.getPersonaByEmail(email)
+            _uiState.update {
+                it.copy(
+                    personaId = persona?.personaId
+                )
+            }
+        }
+    }
+
+
+    private fun getItems(lastCarrito: CarritoEntity?) {
         viewModelScope.launch {
             itemRepository.carritoItems(lastCarrito?.carritoId ?: 0)?.collect { result ->
                 _uiState.update {
@@ -91,16 +114,10 @@ class CarritoViewModel @Inject constructor(
 
     private fun saveCarrito() {
         viewModelScope.launch {
-            _uiState.update {
-                it.copy(
-                    personaId = 1,
-                )
-            }
             carritoRepository.saveCarrito(_uiState.value.toEntity())
-            if(_uiState.value.pagado == true){
+            if (_uiState.value.pagado == true) {
                 cleanCarrito()
             }
-
         }
     }
 
@@ -128,7 +145,7 @@ class CarritoViewModel @Inject constructor(
             itemRepository.deleteItem(item)
             _uiState.update {
                 it.copy(
-                    total = itemRepository.getMontoTotal(item.carritoId?:0)
+                    total = itemRepository.getMontoTotal(item.carritoId ?: 0)
                 )
             }
         }
@@ -143,6 +160,7 @@ data class carritoUistate(
     var total: Double? = null,
     var pagado: Boolean? = null,
     var personaId: Int? = null,
+    var email: String? = null,
     var errorMessage: String? = null
 )
 

@@ -62,6 +62,19 @@ interface ItemDao {
         """
     )
     fun getItemsCount(): Flow<Int>
+
+    @Query(
+        """
+            SELECT COUNT(*) AS item_count
+            FROM Items
+            WHERE carritoId = (SELECT MAX(carritoId) 
+                                FROM Carritos 
+                                WHERE pagado = 0 AND personaId = :personaId)
+            Limit 1
+
+        """
+    )
+    fun getItemsCountByPersona(personaId: Int): Flow<Int>
     @Query(
         """
             SELECT sum(monto) AS item_count

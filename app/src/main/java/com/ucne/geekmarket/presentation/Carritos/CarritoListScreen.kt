@@ -97,7 +97,7 @@ fun CarritoListScreenBody(
         }
         if (uiState.items.isNullOrEmpty()) {
             Row (Modifier.align(Alignment.Center)){
-                EmptyContent()
+                EmptyContent("No hay productos en el carrito")
 
             }
         }

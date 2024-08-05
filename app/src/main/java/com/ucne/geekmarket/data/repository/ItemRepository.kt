@@ -3,20 +3,22 @@ package com.ucne.geekmarket.data.repository
 import com.ucne.geekmarket.data.local.dao.ItemDao
 import com.ucne.geekmarket.data.local.entities.CarritoEntity
 import com.ucne.geekmarket.data.local.entities.ItemEntity
+import com.ucne.geekmarket.presentation.Common.AuthState
 import javax.inject.Inject
 
 
 class ItemRepository @Inject constructor(
     private val itemDao: ItemDao,
     private val productoRepository: ProductoRepository,
-    private val carritoRepository: CarritoRepository
+    private val carritoRepository: CarritoRepository,
+    private val personaRepository: PersonaRepository,
 ) {
     private suspend fun saveItem(item: ItemEntity) = itemDao.save(item)
 
-    suspend fun deleteItem(item: ItemEntity){
-        val items = itemDao.carritoItemSuspend(item.carritoId?:0)
+    suspend fun deleteItem(item: ItemEntity) {
+        val items = itemDao.carritoItemSuspend(item.carritoId ?: 0)
         itemDao.delete(item)
-        val total = getMontoTotal(item.carritoId?:0)
+        val total = getMontoTotal(item.carritoId ?: 0)
         itemDao.calcularTotal(item.carritoId ?: 0, total)
     }
 
@@ -32,11 +34,21 @@ class ItemRepository @Inject constructor(
     private suspend fun getItemByProducto(productoId: Int, carritoId: Int) =
         itemDao.findItemByProducto(productoId, carritoId)
 
-    suspend fun AddItem(item: ItemEntity) {
-        var lastCarrito = carritoRepository.getLastCarrito()
-        if(lastCarrito == null){
-            carritoRepository.saveCarrito(CarritoEntity(personaId = 1, pagado = false))
-            lastCarrito = carritoRepository.getLastCarrito()
+    suspend fun AddItem(item: ItemEntity, authState: AuthState) {
+        val persona = personaRepository.getPersonaByEmail(
+            if (authState is AuthState.Authenticated)
+                authState.email
+            else ""
+        )
+        var lastCarrito = carritoRepository.getLastCarritoByPersona(persona?.personaId ?: 0)
+        if (lastCarrito == null) {
+            carritoRepository.saveCarrito(
+                CarritoEntity(
+                    personaId = persona?.personaId ?: 0,
+                    pagado = false
+                )
+            )
+            lastCarrito = carritoRepository.getLastCarritoByPersona(persona?.personaId ?: 0)
         }
         val existe = itemExist(item.productoId ?: 0, lastCarrito?.carritoId ?: 0)
         val producto = productoRepository.getProducto(item.productoId ?: 0)
@@ -52,7 +64,7 @@ class ItemRepository @Inject constructor(
             )
         } else {
             val itemsRepetido = getItemByProducto(item.productoId ?: 0, lastCarrito?.carritoId ?: 0)
-            val cantidad = (itemsRepetido?.cantidad?: 0) + (item.cantidad ?: 0)
+            val cantidad = (itemsRepetido?.cantidad ?: 0) + (item.cantidad ?: 0)
             val monto = cantidad * (producto?.precio ?: 0.0)
             saveItem(
                 ItemEntity(
@@ -64,12 +76,14 @@ class ItemRepository @Inject constructor(
                 )
             )
         }
-        val items = itemDao.carritoItemSuspend(lastCarrito?.carritoId?:0)
-        val total = items.sumOf { (it.monto ?: 0.0)}
+        val items = itemDao.carritoItemSuspend(lastCarrito?.carritoId ?: 0)
+        val total = items.sumOf { (it.monto ?: 0.0) }
         itemDao.calcularTotal(lastCarrito?.carritoId ?: 0, total)
     }
 
     fun getItem() = itemDao.getAll()
 
-    fun getItemsCount () = itemDao.getItemsCount()
+    fun getItemsCount() = itemDao.getItemsCount()
+
+    fun getItemsCountByPersona(personaId: Int) = itemDao.getItemsCountByPersona(personaId)
 }
