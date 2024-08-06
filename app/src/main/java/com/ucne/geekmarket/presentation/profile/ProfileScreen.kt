@@ -75,6 +75,8 @@ fun ProfileScreen(
                     shape = RoundedCornerShape(16.dp),
                     onClick = {
                         viewModel.signout()
+                        activity.finish()
+                        activity.startActivity(activity.intent)
                     }
                 ) {
                     Icon(
@@ -98,7 +100,9 @@ fun ProfileScreen(
                         .align(Alignment.BottomCenter)
                         .fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
-                    onClick = goToLogin
+                    onClick = {
+                        goToLogin()
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ExitToApp,

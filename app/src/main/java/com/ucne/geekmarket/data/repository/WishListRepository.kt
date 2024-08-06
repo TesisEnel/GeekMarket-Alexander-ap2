@@ -16,6 +16,8 @@ class WishListRepository @Inject constructor(
 
     fun productosByPersona(personaId: Int)= wishDao.productosByPersona(personaId)
 
+    fun getWishCountByPersona(personaId: Int) = wishDao.getWishCountByPersona(personaId)
+
     suspend fun getWish(id: Int)= wishDao.find(id)
 
     suspend fun WishListByProducto(productoId: Int, personaId: Int)= wishDao.wishListByProducto(productoId, personaId)

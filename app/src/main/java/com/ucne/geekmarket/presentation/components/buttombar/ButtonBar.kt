@@ -21,8 +21,10 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -31,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.ucne.geekmarket.presentation.Common.AuthState
 import com.ucne.geekmarket.presentation.navigation.Screen
 import com.ucne.geekmarket.presentation.components.ButtomNavigationItem
 import com.ucne.geekmarket.ui.theme.CardColor
@@ -44,10 +47,16 @@ fun BottonBar(
     currentRoute: String?,
     viewModel: ButtonBarViewModel = hiltViewModel()
 ) {
-//    val itemList by viewModel.items.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsState()
-    val quantity = uiState.quantity
-    viewModel.getQuantity()
+    val authState by viewModel.authState.observeAsState()
+
+    LaunchedEffect(authState) {
+        viewModel.getItemsQuantity()
+        viewModel.getWishQuantity()
+    }
+
+    viewModel.getItemsQuantity()
+    viewModel.getWishQuantity()
 
     Box(contentAlignment = Alignment.BottomCenter) {
         NavigationBar(
@@ -96,8 +105,7 @@ fun BottonBar(
                     direction = Screen.Profile.toString()
                 ),
             )
-            //TODO: Arreglar que cando les das a back se ponga el icono correcto
-            var selectedeDirection by rememberSaveable {
+            var selectedDirection by rememberSaveable {
                 mutableStateOf(currentRoute ?: Screen.ProductList.toString())
             }
 
@@ -107,10 +115,10 @@ fun BottonBar(
                         .align(Alignment.Bottom)
                         .padding(top = 30.dp),
                     alwaysShowLabel = false,
-                    selected = item.direction == selectedeDirection,
+                    selected = item.direction == selectedDirection,
                     onClick = {
-                        selectedeDirection = item.direction ?: ""
-                        when (selectedeDirection) {
+                        selectedDirection = item.direction ?: ""
+                        when (selectedDirection) {
                             Screen.ProductList.toString() -> goToListaProducto()
                             Screen.CarritoList.toString() -> goToCarrito()
                             Screen.WishList.toString() -> goToWishList()
@@ -125,17 +133,23 @@ fun BottonBar(
                         BadgedBox(
                             badge = {
                                 if (item.direction == Screen.CarritoList.toString() &&
-                                    (quantity ?: 0) > 0
+                                    (uiState.itemsQuantity ?: 0) > 0
                                 ) {
                                     Badge {
-                                        Text(text = (uiState.quantity).toString())
+                                        Text(text = (uiState.itemsQuantity).toString())
                                     }
-
+                                }
+                                if (item.direction == Screen.WishList.toString() &&
+                                    (uiState.wishQuantity ?: 0) > 0
+                                ) {
+                                    Badge {
+                                        Text(text = (uiState.wishQuantity).toString())
+                                    }
                                 }
                             }
                         ) {
                             Icon(
-                                imageVector = if (item.direction == selectedeDirection)
+                                imageVector = if (item.direction == selectedDirection)
                                     item.selectedIcon
                                 else
                                     item.unselectedIcon,

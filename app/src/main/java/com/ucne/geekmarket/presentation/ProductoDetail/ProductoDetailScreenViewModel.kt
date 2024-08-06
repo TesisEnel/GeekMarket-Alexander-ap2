@@ -56,7 +56,6 @@ class ProductoDetailScreenViewModel @Inject constructor(
         }
     }
 
-
     fun onAddWish(productoId: Int?) {
         viewModelScope.launch {
             val persona = personaRepository.getPersonaByEmail(

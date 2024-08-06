@@ -20,4 +20,6 @@ class CarritoRepository @Inject constructor(
 
     fun getCarritos()= carritoDao.getAll()
 
+    fun getAllCarritoByPersona(personaId: Int)= carritoDao.getAllByPersona(personaId)
+
 }
