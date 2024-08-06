@@ -29,8 +29,22 @@ interface PersonaDao {
     @Query("UPDATE Carritos SET personaId = :personaId WHERE personaId = 0")
     suspend fun updateCarritoPersonaId(personaId: Int)
 
-    @Query("UPDATE Wishes SET personaId = :personaId WHERE personaId = 0")
+//    @Query("UPDATE Wishes SET personaId = :personaId WHERE personaId = 0")
+//    suspend fun updateWishPersonaId(personaId: Int)
+
+    @Query("""
+    UPDATE Wishes 
+    SET personaId = :personaId 
+    WHERE personaId = 0 
+    AND NOT EXISTS (
+        SELECT 1 
+        FROM Wishes 
+        WHERE personaId = :personaId 
+        AND productoId = Wishes.productoId
+    )
+    """)
     suspend fun updateWishPersonaId(personaId: Int)
+
 
     @Query("SELECT * FROM Personas WHERE email LIKE  :email")
     suspend fun getPersonaByEmail(email: String): PersonaEntity?

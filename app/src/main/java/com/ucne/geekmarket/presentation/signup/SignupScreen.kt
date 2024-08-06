@@ -168,7 +168,7 @@ private fun SingupScreen(
             onValueChange = onFechaChaged,
             readOnly = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            trailingIcon = {
+            leadingIcon = {
                 IconButton(
                     onClick = {
                         showDatePicker = true
@@ -180,11 +180,10 @@ private fun SingupScreen(
                     )
                 }
             },
-            modifier = Modifier.fillMaxWidth()
-
-                .clickable(enabled = true) {
-                    showDatePicker = true
-                }
+            modifier = Modifier.clickable(enabled = true) {
+                showDatePicker = true
+            },
+            shape = RoundedCornerShape(16.dp)
         )
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -264,11 +263,12 @@ private fun SingupScreen(
                 confirmButton = {
                     Button(
                         onClick = {
-                            onFechaChaged( state.selectedDateMillis?.let {
-                                Instant.ofEpochMilli(it).atZone(
-                                    ZoneId.of("UTC")
-                                ).format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
-                            }.toString()
+                            onFechaChaged(
+                                state.selectedDateMillis?.let {
+                                    Instant.ofEpochMilli(it).atZone(
+                                        ZoneId.of("UTC")
+                                    ).format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
+                                }.toString()
                             )
                             showDatePicker = false
                         },

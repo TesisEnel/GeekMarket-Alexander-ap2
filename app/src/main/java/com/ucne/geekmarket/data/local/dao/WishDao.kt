@@ -11,10 +11,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface WishDao {
     @Upsert
-    suspend fun save(WishList: WishEntity)
+    suspend fun save(wishList: WishEntity)
 
     @Delete
-    suspend fun delete(WishList: WishEntity)
+    suspend fun delete(wishList: WishEntity)
 
     @Query(
         """
@@ -25,6 +25,16 @@ interface WishDao {
         """
     )
     suspend fun find(id: Int): WishEntity?
+
+    @Query(
+        """
+            SELECT COUNT(*) AS item_count
+            FROM Wishes
+            WHERE personaId = :personaId
+            Limit 1
+        """
+    )
+    fun getWishCountByPersona(personaId: Int): Flow<Int>
 
     @Query(
         """
@@ -51,10 +61,10 @@ interface WishDao {
             SELECT EXISTS 
                 (SELECT 1 
                  FROM Wishes 
-                 WHERE productoId = :productoId AND PersonaId = :PersonaId)
+                 WHERE productoId = :productoId AND PersonaId = :personaId)
         """
     )
-    suspend fun itemExit(productoId: Int, PersonaId: Int): Boolean
+    suspend fun itemExit(productoId: Int, personaId: Int): Boolean
 
     @Query("SELECT * FROM Wishes")
     fun getAll(): Flow<List<WishEntity>>

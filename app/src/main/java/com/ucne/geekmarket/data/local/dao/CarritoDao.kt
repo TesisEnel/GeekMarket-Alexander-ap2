@@ -54,5 +54,8 @@ interface CarritoDao {
     @Query("SELECT * FROM carritos")
     fun getAll(): Flow<List<CarritoEntity>>
 
+    @Query("SELECT * FROM carritos Where personaId = :personaId")
+    fun getAllByPersona(personaId: Int): Flow<List<CarritoEntity>>?
+
 
 }

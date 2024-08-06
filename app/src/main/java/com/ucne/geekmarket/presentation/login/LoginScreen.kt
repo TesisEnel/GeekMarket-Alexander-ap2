@@ -1,5 +1,6 @@
 package com.ucne.geekmarket.presentation.login
 
+import android.app.Activity
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -51,7 +52,7 @@ fun LoginScreen(
     goToProductList: () -> Unit,
     authViewModel: LoginViewModel = hiltViewModel()
 ) {
-
+    val activity = LocalContext.current as Activity
     val authState = authViewModel.authState.observeAsState()
     val context = LocalContext.current
     val uiState by authViewModel.uiState.collectAsState()
@@ -61,6 +62,8 @@ fun LoginScreen(
             is AuthState.Authenticated -> {
                 authViewModel.cambiarPersonaId()
                 goToProductList()
+                activity.finish()
+                activity.startActivity(activity.intent)
             }
             is AuthState.Error -> Toast.makeText(
                 context,
