@@ -10,6 +10,7 @@ import com.ucne.geekmarket.data.local.entities.ProductoEntity
 import com.ucne.geekmarket.data.local.entities.PromocionEntity
 import com.ucne.geekmarket.data.repository.AuthRepository
 import com.ucne.geekmarket.data.repository.ItemRepository
+import com.ucne.geekmarket.data.repository.PersonaRepository
 import com.ucne.geekmarket.data.repository.ProductoRepository
 import com.ucne.geekmarket.data.repository.PromcionRepository
 import com.ucne.geekmarket.presentation.Common.AuthState
@@ -27,6 +28,7 @@ class ProductoViewModel @Inject constructor(
     private val itemRepository: ItemRepository,
     private val promocionRepository: PromcionRepository,
     private val authRepository: AuthRepository,
+    private val personaRepository: PersonaRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow((ProductoUistate()))
@@ -45,6 +47,7 @@ class ProductoViewModel @Inject constructor(
         loadProductos()
         getPromociones()
         getProductos()
+        loadPersonaToDb()
     }
 
     private fun getProductos() {
@@ -63,7 +66,17 @@ class ProductoViewModel @Inject constructor(
         }
     }
 
-
+    private fun loadPersonaToDb(){
+        viewModelScope.launch {
+            personaRepository.getAllPersonas().collect{
+                _uiState.update {
+                    it.copy(
+                        errorMessage = it.errorMessage
+                    )
+                }
+            }
+        }
+    }
 
     private fun loadProductos(){
         viewModelScope.launch {
@@ -77,7 +90,6 @@ class ProductoViewModel @Inject constructor(
         }
     }
 
-
     private fun getPromociones() {
         viewModelScope.launch {
             promocionRepository.getApiToDb()
@@ -90,6 +102,7 @@ class ProductoViewModel @Inject constructor(
             }
         }
     }
+
 }
 
 

@@ -7,6 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.ucne.geekmarket.data.local.entities.CarritoEntity
 import com.ucne.geekmarket.data.local.entities.ItemEntity
 import com.ucne.geekmarket.data.local.entities.ProductoEntity
+import com.ucne.geekmarket.data.remote.api.CarritoApi
+import com.ucne.geekmarket.data.remote.dto.CarritoDto
+import com.ucne.geekmarket.data.remote.dto.ItemDto
 import com.ucne.geekmarket.data.repository.AuthRepository
 import com.ucne.geekmarket.data.repository.CarritoRepository
 import com.ucne.geekmarket.data.repository.ItemRepository
@@ -26,7 +29,7 @@ class CarritoViewModel @Inject constructor(
     private val itemRepository: ItemRepository,
     private val productoRepository: ProductoRepository,
     private val personaRepository: PersonaRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(carritoUistate())
@@ -47,6 +50,9 @@ class CarritoViewModel @Inject constructor(
             }
         }
     }
+
+
+
 
     private fun getLastCarritoByPersona() {
         viewModelScope.launch {
@@ -114,10 +120,13 @@ class CarritoViewModel @Inject constructor(
 
     private fun saveCarrito() {
         viewModelScope.launch {
-            carritoRepository.saveCarrito(_uiState.value.toEntity())
-            if (_uiState.value.pagado == true) {
-                cleanCarrito()
+            if((!_uiState.value.items.isNullOrEmpty())){
+                carritoRepository.saveCarritoApi(_uiState.value.toDTO())
+//                carritoRepository.saveCarrito(_uiState.value.toEntity())
             }
+        }
+        if (_uiState.value.pagado == true) {
+            cleanCarrito()
         }
     }
 
@@ -159,12 +168,26 @@ data class carritoUistate(
     var items: List<ItemEntity>? = null,
     var total: Double? = null,
     var pagado: Boolean? = null,
+    var guardado: Boolean? = null,
     var personaId: Int? = null,
     var email: String? = null,
     var errorMessage: String? = null
 )
 
-
+fun carritoUistate.toDTO() = CarritoDto(
+    carritoId = carritoId,
+    total = total ?: 0.0,
+    personaId = personaId ?: 0,
+    pagado = pagado ?: false,
+    items = items?.map { it.toDTO() }
+)
+fun ItemEntity.toDTO() = ItemDto(
+    itemId = itemId,
+    carritoId = carritoId,
+    productoId = productoId,
+    cantidad = cantidad,
+    monto = monto
+)
 fun carritoUistate.toEntity() = CarritoEntity(
     carritoId = carritoId,
     total = total ?: 0.0,

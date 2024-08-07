@@ -40,27 +40,25 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.ucne.geekmarket.R
 import com.ucne.geekmarket.presentation.Common.AuthState
-import com.ucne.geekmarket.presentation.navigation.Screen
 
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
     goToSignup: () -> Unit,
     goToProductList: () -> Unit,
-    authViewModel: LoginViewModel = hiltViewModel()
+    viewModel: LoginViewModel = hiltViewModel()
 ) {
     val activity = LocalContext.current as Activity
-    val authState = authViewModel.authState.observeAsState()
+    val authState = viewModel.authState.observeAsState()
     val context = LocalContext.current
-    val uiState by authViewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(authState.value) {
         when (authState.value) {
             is AuthState.Authenticated -> {
-                authViewModel.cambiarPersonaId()
+                viewModel.cambiarPersonaId()
                 goToProductList()
                 activity.finish()
                 activity.startActivity(activity.intent)
@@ -79,9 +77,9 @@ fun LoginScreen(
         uiState = uiState,
         authState = authState,
         goToSignup = goToSignup,
-        onEmailChanged = authViewModel::onEmailChanged,
-        onPasswordChanged = authViewModel::onPasswordChanged,
-        login = authViewModel::login
+        onEmailChanged = viewModel::onEmailChanged,
+        onPasswordChanged = viewModel::onPasswordChanged,
+        login = viewModel::login
     )
 
 }

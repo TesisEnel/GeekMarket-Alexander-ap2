@@ -47,6 +47,7 @@ fun BottonBar(
     currentRoute: String?,
     viewModel: ButtonBarViewModel = hiltViewModel()
 ) {
+
     val uiState by viewModel.uiState.collectAsState()
     val authState by viewModel.authState.observeAsState()
 

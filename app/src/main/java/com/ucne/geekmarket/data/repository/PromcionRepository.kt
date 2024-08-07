@@ -1,14 +1,10 @@
 package com.ucne.geekmarket.data.repository
 
 import android.util.Log
-import com.ucne.geekmarket.data.local.dao.ProductoDao
 import com.ucne.geekmarket.data.local.dao.PromocionDao
 import com.ucne.geekmarket.data.local.entities.PromocionEntity
-import com.ucne.geekmarket.data.remote.ProductoApi
-import com.ucne.geekmarket.data.remote.PromocionApi
+import com.ucne.geekmarket.data.remote.api.PromocionApi
 import com.ucne.geekmarket.data.remote.dto.PromocionDto
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class PromcionRepository @Inject constructor(

@@ -1,14 +1,15 @@
 package com.ucne.geekmarket.data.di
 
-import android.app.Application
 import android.content.Context
 import androidx.room.Room
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.ucne.geekmarket.data.local.database.GeekMarketDb
-import com.ucne.geekmarket.data.remote.ProductoApi
-import com.ucne.geekmarket.data.remote.PromocionApi
+import com.ucne.geekmarket.data.remote.api.CarritoApi
+import com.ucne.geekmarket.data.remote.api.PersonaApi
+import com.ucne.geekmarket.data.remote.api.ProductoApi
+import com.ucne.geekmarket.data.remote.api.PromocionApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -47,6 +48,25 @@ object AppModule {
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
             .create(PromocionApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCarritoApi(moshi: Moshi): CarritoApi {
+        return Retrofit.Builder()
+            .baseUrl("https://ap2ticket.azurewebsites.net/")
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
+            .create(CarritoApi::class.java)
+    }
+    @Provides
+    @Singleton
+    fun providePersonaApi(moshi: Moshi): PersonaApi {
+        return Retrofit.Builder()
+            .baseUrl("https://ap2ticket.azurewebsites.net/")
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
+            .create(PersonaApi::class.java)
     }
 
     @Provides

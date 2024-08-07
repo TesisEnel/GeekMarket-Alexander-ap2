@@ -88,7 +88,7 @@ class SignupViewModel @Inject constructor(
                 _authState.value = it
             }
             if(_authState.value is AuthState.Authenticated){
-                personaRepository.savePersona(_uiState.value.toEntity())
+                personaRepository.savePersonaSignUp(_uiState.value.toEntity())
             }
         }
     }
