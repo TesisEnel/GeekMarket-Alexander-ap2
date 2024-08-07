@@ -1,4 +1,4 @@
-package com.ucne.geekmarket.data.remote
+package com.ucne.geekmarket.data.remote.api
 
 import com.ucne.geekmarket.data.remote.dto.ProductoDto
 import retrofit2.Response

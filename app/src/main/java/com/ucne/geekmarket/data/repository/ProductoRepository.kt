@@ -3,7 +3,7 @@ package com.ucne.geekmarket.data.repository
 import android.util.Log
 import com.ucne.geekmarket.data.local.dao.ProductoDao
 import com.ucne.geekmarket.data.local.entities.ProductoEntity
-import com.ucne.geekmarket.data.remote.ProductoApi
+import com.ucne.geekmarket.data.remote.api.ProductoApi
 import com.ucne.geekmarket.data.remote.dto.ProductoDto
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

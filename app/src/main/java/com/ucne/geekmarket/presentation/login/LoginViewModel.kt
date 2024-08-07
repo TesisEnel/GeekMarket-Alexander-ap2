@@ -1,15 +1,22 @@
 package com.ucne.geekmarket.presentation.login
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ucne.geekmarket.data.local.entities.PersonaEntity
+import com.ucne.geekmarket.data.remote.api.PersonaApi
+import com.ucne.geekmarket.data.remote.dto.PersonaDto
 import com.ucne.geekmarket.data.repository.AuthRepository
 import com.ucne.geekmarket.data.repository.PersonaRepository
 import com.ucne.geekmarket.presentation.Common.AuthState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -17,7 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val personaRepository: PersonaRepository
+    private val personaRepository: PersonaRepository,
 ) : ViewModel() {
 
     private val _authState = MutableLiveData<AuthState>()
@@ -37,8 +44,6 @@ class LoginViewModel @Inject constructor(
             )
         }
     }
-
-
 
     fun onPasswordChanged(password: String) {
         _uiState.update {
@@ -64,18 +69,22 @@ class LoginViewModel @Inject constructor(
             ).collect {
                 _authState.value = it
             }
-
         }
-
     }
 
     fun cambiarPersonaId() {
         if(_authState.value is AuthState.Authenticated){
-            val email = (_authState.value as AuthState.Authenticated).email
-            var personaId = 0
             viewModelScope.launch {
-                personaId = personaRepository.getPersonaByEmail(email)?.personaId ?: 0
-                personaRepository.updatePersonaId(personaId)
+                personaRepository.savePersona(
+                    PersonaEntity(
+                        personaId = _uiState.value.personaId ?: 0,
+                        nombre = _uiState.value.nombre ?: "",
+                        apellido = _uiState.value.apellido ?: "",
+                        fechaNacimiento = _uiState.value.FechaNacimiento ?: "",
+                        email = _uiState.value.email ?: ""
+                    )
+                )
+                personaRepository.updatePersonaId(_uiState.value.personaId ?: 0)
             }
         }
     }
@@ -87,9 +96,11 @@ data class LoginUistate(
     var personaId: Int? = null,
     var nombre: String? = null,
     var apellido: String? = null,
-    var edad: Int? = null,
+    var FechaNacimiento: String? = null,
     var password: String? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null
 )
+
+
 
