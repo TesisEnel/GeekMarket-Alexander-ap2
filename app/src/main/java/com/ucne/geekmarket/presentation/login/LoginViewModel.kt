@@ -75,16 +75,21 @@ class LoginViewModel @Inject constructor(
     fun cambiarPersonaId() {
         if(_authState.value is AuthState.Authenticated){
             viewModelScope.launch {
+                val persona = personaRepository.getPersonaByEmail(
+                    if (_authState.value is AuthState.Authenticated)
+                        (_authState.value as AuthState.Authenticated).email
+                    else ""
+                )
                 personaRepository.savePersona(
                     PersonaEntity(
-                        personaId = _uiState.value.personaId ?: 0,
-                        nombre = _uiState.value.nombre ?: "",
-                        apellido = _uiState.value.apellido ?: "",
-                        fechaNacimiento = _uiState.value.FechaNacimiento ?: "",
-                        email = _uiState.value.email ?: ""
+                        personaId = persona?.personaId ?: 0,
+                        nombre = persona?.nombre ?: "",
+                        apellido = persona?.apellido ?: "",
+                        fechaNacimiento = persona?.fechaNacimiento ?: "",
+                        email = persona?.email ?: ""
                     )
                 )
-                personaRepository.updatePersonaId(_uiState.value.personaId ?: 0)
+                personaRepository.updatePersonaId(persona?.personaId ?: 0)
             }
         }
     }

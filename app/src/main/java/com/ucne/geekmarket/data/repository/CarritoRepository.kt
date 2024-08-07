@@ -23,6 +23,8 @@ class CarritoRepository @Inject constructor(
 
     suspend fun getLastCarritoByPersona(personaId: Int)= carritoDao.getLastCarritoByPersona(personaId)
 
+     fun getLastCarritoByEmail(email: String) = carritoDao.getLastCarritoByEmail(email)
+
     fun getCarritos()= carritoDao.getAll()
 
     fun getAllCarritoByPersona(personaId: Int)= carritoDao.getAllByPersona(personaId)
@@ -47,6 +49,7 @@ class CarritoRepository @Inject constructor(
                     personaId = carritoDto.personaId,
                     items = carritoDto.items?.map {
                         ItemDto(
+                            carritoId = it.carritoId,
                             productoId = it.productoId,
                             cantidad = it.cantidad,
                             monto = it.monto

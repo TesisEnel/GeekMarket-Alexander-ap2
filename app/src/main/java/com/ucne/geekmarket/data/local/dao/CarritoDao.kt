@@ -51,6 +51,18 @@ interface CarritoDao {
     )
     suspend fun getLastCarritoByPersona(personaId: Int): CarritoEntity?
 
+
+    @Query(
+        """
+           SELECT *
+            FROM carritos 
+            WHERE personaId in (SELECT personaId FROM personas WHERE email like :email)
+            ORDER BY carritoId DESC 
+            LIMIT 1;
+        """
+    )
+    fun getLastCarritoByEmail(email: String): Flow<CarritoEntity>
+
     @Query("SELECT * FROM carritos")
     fun getAll(): Flow<List<CarritoEntity>>
 

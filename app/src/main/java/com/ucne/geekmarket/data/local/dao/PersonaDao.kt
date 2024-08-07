@@ -46,7 +46,7 @@ interface PersonaDao {
     suspend fun updateWishPersonaId(personaId: Int)
 
 
-    @Query("SELECT * FROM Personas WHERE email LIKE  :email")
+    @Query("SELECT * FROM Personas WHERE email like :email Limit 1")
     suspend fun getPersonaByEmail(email: String): PersonaEntity?
 
     @Query("SELECT * FROM Personas")
