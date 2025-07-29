@@ -1,3 +1,4 @@
+
 # GeekMarket
 
 GeekMarket es una aplicación de comercio electrónico desarrollada con Jetpack Compose, Firebase y SQLite. Esta aplicación permite a los usuarios navegar, buscar y comprar productos de una manera intuitiva y eficiente.
